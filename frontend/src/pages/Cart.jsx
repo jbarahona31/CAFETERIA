@@ -120,7 +120,7 @@ function Cart() {
           {cart.map(item => (
             <div key={item.id} className="cart-item card fade-in">
               <img 
-                src={item.imagen_url || '/img/placeholder.jpg'} 
+                src={item.imagen_url || '/img/placeholder.svg'} 
                 alt={item.nombre}
                 className="cart-item-image"
               />

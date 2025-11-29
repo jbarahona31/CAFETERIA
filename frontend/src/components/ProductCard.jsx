@@ -28,7 +28,7 @@ function ProductCard({ product }) {
     <article className="product-card card fade-in">
       <div className="product-image-container">
         <img 
-          src={product.imagen_url || '/img/placeholder.jpg'} 
+          src={product.imagen_url || '/img/placeholder.svg'} 
           alt={`${product.nombre} - ${product.categoria}`}
           className="product-image"
           loading="lazy"
