@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+  <rect width="300" height="300" fill="#E9ECEF"/>
+  <text x="150" y="150" text-anchor="middle" dy=".3em" font-family="Arial, sans-serif" font-size="20" fill="#6C757D">
+    Imagen no disponible
+  </text>
+  <text x="150" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#ADB5BD">
+    🍽️
+  </text>
+</svg>

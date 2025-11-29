@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="45" fill="#4A2C2A"/>
+  <path d="M25 45 Q25 30 40 30 L60 30 Q75 30 75 45 L75 55 Q75 70 60 70 L40 70 Q25 70 25 55 Z" fill="#FFC107"/>
+  <circle cx="35" cy="50" r="5" fill="#8BC34A"/>
+  <circle cx="50" cy="50" r="5" fill="#8BC34A"/>
+  <circle cx="65" cy="50" r="5" fill="#8BC34A"/>
+  <text x="50" y="90" text-anchor="middle" fill="#FFC107" font-size="10" font-family="serif">ESC</text>
+</svg>
