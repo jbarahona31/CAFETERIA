@@ -5,7 +5,7 @@
 
 > El auténtico sabor de nuestra tierra 🇨🇴
 
-Sistema completo de menú digital para cafetería con gestión de pedidos en tiempo real, desarrollado con Node.js, Express, Socket.IO, React y MySQL.
+Sistema completo de menú digital para cafetería con gestión de pedidos en tiempo real, desarrollado con Node.js, Express, Socket.IO, React y PostgreSQL.
 
 ## 📋 Tabla de Contenidos
 
@@ -40,7 +40,8 @@ Sistema completo de menú digital para cafetería con gestión de pedidos en tie
 ### Características Técnicas
 - 🚀 Comunicación en tiempo real con Socket.IO
 - 🔒 Validación de stock antes de crear pedidos
-- 💾 Persistencia en MySQL
+- 🔐 Autenticación con bcrypt para contraseñas
+- 💾 Persistencia en PostgreSQL
 - 📦 Cálculo automático de totales
 
 ## 🛠 Tecnologías
@@ -49,7 +50,8 @@ Sistema completo de menú digital para cafetería con gestión de pedidos en tie
 - Node.js
 - Express.js
 - Socket.IO
-- MySQL2
+- PostgreSQL (pg - node-postgres)
+- bcrypt
 
 ### Frontend
 - React 18
@@ -68,13 +70,16 @@ el-sabor-colombiano/
 │   │   │   └── database.js
 │   │   ├── controllers/
 │   │   │   ├── orderController.js
-│   │   │   └── productController.js
+│   │   │   ├── productController.js
+│   │   │   └── userController.js
 │   │   ├── routes/
 │   │   │   ├── orderRoutes.js
-│   │   │   └── productRoutes.js
+│   │   │   ├── productRoutes.js
+│   │   │   └── userRoutes.js
 │   │   ├── services/
 │   │   │   ├── orderService.js
-│   │   │   └── productService.js
+│   │   │   ├── productService.js
+│   │   │   └── userService.js
 │   │   ├── scripts/
 │   │   │   └── seed.js
 │   │   └── index.js
@@ -115,6 +120,7 @@ el-sabor-colombiano/
 │   ├── vite.config.js
 │   └── package.json
 ├── database/
+│   ├── init.sql
 │   ├── schema.sql
 │   └── seed.sql
 └── README.md
@@ -123,7 +129,7 @@ el-sabor-colombiano/
 ## 📋 Requisitos Previos
 
 - Node.js 18+ y npm
-- MySQL 8.0+
+- PostgreSQL 14+
 
 ## 🚀 Instalación
 
@@ -134,12 +140,18 @@ git clone https://github.com/tu-usuario/el-sabor-colombiano.git
 cd el-sabor-colombiano
 ```
 
-### 2. Configurar la base de datos
+### 2. Configurar la base de datos PostgreSQL
 
 ```bash
-# Conectar a MySQL y ejecutar los scripts
-mysql -u root -p < database/schema.sql
-mysql -u root -p < database/seed.sql
+# Crear la base de datos
+createdb el_sabor_colombiano
+
+# Ejecutar el script de inicialización (schema + seed)
+psql -d el_sabor_colombiano -f database/init.sql
+
+# O ejecutar los scripts por separado
+psql -d el_sabor_colombiano -f database/schema.sql
+psql -d el_sabor_colombiano -f database/seed.sql
 ```
 
 ### 3. Instalar dependencias del Backend
@@ -148,7 +160,7 @@ mysql -u root -p < database/seed.sql
 cd backend
 npm install
 cp .env.example .env
-# Editar .env con tus credenciales de base de datos
+# Editar .env con tus credenciales de PostgreSQL
 ```
 
 ### 4. Instalar dependencias del Frontend
@@ -171,10 +183,14 @@ Coloca los siguientes archivos de audio en `frontend/public/sounds/`:
 ### Backend (.env)
 
 ```env
-DB_HOST=localhost
-DB_USER=root
-DB_PASS=tu_contraseña
-DB_NAME=el_sabor_colombiano
+# PostgreSQL Database Configuration
+PGHOST=localhost
+PGUSER=postgres
+PGPASSWORD=tu_contraseña
+PGDATABASE=el_sabor_colombiano
+PGPORT=5432
+
+# Server Configuration
 PORT=3001
 ```
 
@@ -235,6 +251,17 @@ npm run preview
 | GET | `/api/pedidos` | Lista pedidos (opcional: `?estado=pendiente`) |
 | PUT | `/api/pedidos/:id/estado` | Actualiza el estado de un pedido |
 
+### Usuarios
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/usuarios` | Lista todos los usuarios |
+| GET | `/api/usuarios/:id` | Obtiene un usuario por ID |
+| POST | `/api/usuarios` | Crea un nuevo usuario |
+| PUT | `/api/usuarios/:id` | Actualiza un usuario |
+| DELETE | `/api/usuarios/:id` | Elimina un usuario |
+| POST | `/api/usuarios/login` | Autenticación de usuario |
+
 #### Ejemplo de creación de pedido:
 
 ```json
@@ -248,9 +275,36 @@ POST /api/pedidos
 }
 ```
 
+#### Ejemplo de creación de usuario:
+
+```json
+POST /api/usuarios
+{
+  "nombre": "Juan Mesero",
+  "email": "juan@cafeteria.com",
+  "contrasena": "miPassword123",
+  "rol": "mesero"
+}
+```
+
+#### Ejemplo de login:
+
+```json
+POST /api/usuarios/login
+{
+  "email": "juan@cafeteria.com",
+  "contrasena": "miPassword123"
+}
+```
+
 #### Estados válidos de pedido:
 - `pendiente` → `preparacion` → `listo` → `entregado`
 - `cancelado` (desde cualquier estado)
+
+#### Roles de usuario:
+- `admin` - Administrador del sistema
+- `mesero` - Personal de servicio
+- `cocina` - Personal de cocina
 
 ## 🔌 Eventos Socket.IO
 
@@ -271,16 +325,58 @@ POST /api/pedidos
 
 ## 🗃️ Base de Datos
 
+### PostgreSQL
+
+Este proyecto utiliza **PostgreSQL** como base de datos. Las características principales incluyen:
+
+- **SERIAL** para campos auto-incrementales
+- **BOOLEAN** para valores booleanos
+- **NUMERIC(10,2)** para valores decimales
+- **TIMESTAMP DEFAULT CURRENT_TIMESTAMP** para fechas automáticas
+- **Foreign Keys** con ON DELETE CASCADE
+
 ### Tablas
 
 **productos**
-- id, nombre, categoria (comida/bebida), descripcion, precio, stock, promocion, imagen_url
+```sql
+id SERIAL PRIMARY KEY
+nombre VARCHAR(120)
+categoria VARCHAR(20)
+descripcion TEXT
+precio NUMERIC(10,2)
+stock INT
+promocion BOOLEAN
+imagen_url TEXT
+```
 
 **pedidos**
-- id, cliente, estado, total, created_at
+```sql
+id SERIAL PRIMARY KEY
+cliente VARCHAR(120)
+estado VARCHAR(20)
+total NUMERIC(10,2)
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+```
 
 **detalle_pedido**
-- id, pedido_id, producto_id, cantidad, precio_unitario, subtotal
+```sql
+id SERIAL PRIMARY KEY
+pedido_id INT REFERENCES pedidos(id) ON DELETE CASCADE
+producto_id INT REFERENCES productos(id)
+cantidad INT
+precio_unitario NUMERIC(10,2)
+subtotal NUMERIC(10,2)
+```
+
+**usuarios**
+```sql
+id SERIAL PRIMARY KEY
+nombre VARCHAR(100)
+email VARCHAR(120) UNIQUE
+contrasena_hash VARCHAR(255)
+rol VARCHAR(20)
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+```
 
 ### Seed de datos
 
@@ -326,9 +422,9 @@ npm run build
 # Subir carpeta dist/ al hosting
 ```
 
-### Base de datos (Recomendado: PlanetScale, Railway, RDS)
+### Base de datos (Recomendado: Supabase, Railway, Neon, RDS)
 
-Actualizar variables de entorno con credenciales del servicio de base de datos gestionado.
+Actualizar variables de entorno con credenciales del servicio de PostgreSQL gestionado.
 
 ## 📝 Licencia
 

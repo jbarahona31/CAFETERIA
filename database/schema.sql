@@ -1,44 +1,55 @@
--- El Sabor Colombiano - Database Schema
--- Create database (run as admin/root)
-CREATE DATABASE IF NOT EXISTS el_sabor_colombiano CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- El Sabor Colombiano - PostgreSQL Database Schema
+-- Create database (run as admin/superuser)
+-- CREATE DATABASE el_sabor_colombiano WITH ENCODING 'UTF8';
 
-USE el_sabor_colombiano;
+-- Connect to the database before running the rest of this script
+-- \c el_sabor_colombiano
 
 -- Tabla productos
 CREATE TABLE IF NOT EXISTS productos (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   nombre VARCHAR(120) NOT NULL,
-  categoria ENUM('comida','bebida') NOT NULL,
-  descripcion VARCHAR(255),
-  precio DECIMAL(10,2) NOT NULL,
+  categoria VARCHAR(20) NOT NULL,
+  descripcion TEXT,
+  precio NUMERIC(10,2) NOT NULL,
   stock INT DEFAULT 0,
   promocion BOOLEAN DEFAULT FALSE,
-  imagen_url VARCHAR(255)
+  imagen_url TEXT
 );
 
 -- Tabla pedidos
 CREATE TABLE IF NOT EXISTS pedidos (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   cliente VARCHAR(120),
-  estado ENUM('pendiente','preparacion','listo','entregado','cancelado') DEFAULT 'pendiente',
-  total DECIMAL(10,2) DEFAULT 0.00,
+  estado VARCHAR(20) DEFAULT 'pendiente',
+  total NUMERIC(10,2) DEFAULT 0.00,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Tabla detalle_pedido
 CREATE TABLE IF NOT EXISTS detalle_pedido (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  pedido_id INT NOT NULL,
-  producto_id INT NOT NULL,
+  id SERIAL PRIMARY KEY,
+  pedido_id INT NOT NULL REFERENCES pedidos(id) ON DELETE CASCADE,
+  producto_id INT NOT NULL REFERENCES productos(id),
   cantidad INT NOT NULL,
-  precio_unitario DECIMAL(10,2) NOT NULL,
-  subtotal DECIMAL(10,2) NOT NULL,
-  FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
-  FOREIGN KEY (producto_id) REFERENCES productos(id)
+  precio_unitario NUMERIC(10,2) NOT NULL,
+  subtotal NUMERIC(10,2) NOT NULL
+);
+
+-- Tabla usuarios
+CREATE TABLE IF NOT EXISTS usuarios (
+  id SERIAL PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
+  email VARCHAR(120) UNIQUE NOT NULL,
+  contrasena_hash VARCHAR(255) NOT NULL,
+  rol VARCHAR(20) DEFAULT 'mesero',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Indexes for better performance
-CREATE INDEX idx_productos_categoria ON productos(categoria);
-CREATE INDEX idx_productos_promocion ON productos(promocion);
-CREATE INDEX idx_pedidos_estado ON pedidos(estado);
-CREATE INDEX idx_detalle_pedido_pedido ON detalle_pedido(pedido_id);
+CREATE INDEX IF NOT EXISTS idx_productos_categoria ON productos(categoria);
+CREATE INDEX IF NOT EXISTS idx_productos_promocion ON productos(promocion);
+CREATE INDEX IF NOT EXISTS idx_pedidos_estado ON pedidos(estado);
+CREATE INDEX IF NOT EXISTS idx_detalle_pedido_pedido ON detalle_pedido(pedido_id);
+CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email);
+CREATE INDEX IF NOT EXISTS idx_usuarios_rol ON usuarios(rol);

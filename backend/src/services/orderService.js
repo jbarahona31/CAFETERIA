@@ -3,10 +3,10 @@ const productService = require('./productService');
 
 class OrderService {
   async create(cliente, items) {
-    const connection = await pool.getConnection();
+    const client = await pool.connect();
     
     try {
-      await connection.beginTransaction();
+      await client.query('BEGIN');
 
       // Calculate total
       let total = 0;
@@ -31,17 +31,17 @@ class OrderService {
       }
 
       // Create order
-      const [orderResult] = await connection.query(
-        'INSERT INTO pedidos (cliente, estado, total) VALUES (?, ?, ?)',
+      const orderResult = await client.query(
+        'INSERT INTO pedidos (cliente, estado, total) VALUES ($1, $2, $3) RETURNING id',
         [cliente, 'pendiente', total]
       );
       
-      const pedidoId = orderResult.insertId;
+      const pedidoId = orderResult.rows[0].id;
 
       // Create order details
       for (const detail of detailItems) {
-        await connection.query(
-          'INSERT INTO detalle_pedido (pedido_id, producto_id, cantidad, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)',
+        await client.query(
+          'INSERT INTO detalle_pedido (pedido_id, producto_id, cantidad, precio_unitario, subtotal) VALUES ($1, $2, $3, $4, $5)',
           [pedidoId, detail.productoId, detail.cantidad, detail.precioUnitario, detail.subtotal]
         );
       }
@@ -49,7 +49,7 @@ class OrderService {
       // Decrement stock
       await productService.decrementStock(items);
 
-      await connection.commit();
+      await client.query('COMMIT');
 
       return {
         pedidoId,
@@ -60,24 +60,27 @@ class OrderService {
       };
 
     } catch (error) {
-      await connection.rollback();
+      await client.query('ROLLBACK');
       throw error;
     } finally {
-      connection.release();
+      client.release();
     }
   }
 
   async getAll(estado = null) {
     let query = `
       SELECT p.id, p.cliente, p.estado, p.total, p.created_at,
-             JSON_ARRAYAGG(
-               JSON_OBJECT(
-                 'productoId', dp.producto_id,
-                 'nombre', pr.nombre,
-                 'cantidad', dp.cantidad,
-                 'precioUnitario', dp.precio_unitario,
-                 'subtotal', dp.subtotal
-               )
+             COALESCE(
+               json_agg(
+                 json_build_object(
+                   'productoId', dp.producto_id,
+                   'nombre', pr.nombre,
+                   'cantidad', dp.cantidad,
+                   'precioUnitario', dp.precio_unitario,
+                   'subtotal', dp.subtotal
+                 )
+               ) FILTER (WHERE dp.id IS NOT NULL),
+               '[]'
              ) as items
       FROM pedidos p
       LEFT JOIN detalle_pedido dp ON p.id = dp.pedido_id
@@ -86,48 +89,43 @@ class OrderService {
     
     const params = [];
     if (estado) {
-      query += ' WHERE p.estado = ?';
+      query += ' WHERE p.estado = $1';
       params.push(estado);
     }
 
     query += ' GROUP BY p.id ORDER BY p.created_at DESC';
 
-    const [rows] = await pool.query(query, params);
+    const result = await pool.query(query, params);
     
-    // Parse JSON items
-    return rows.map(row => ({
-      ...row,
-      items: row.items ? JSON.parse(row.items) : []
-    }));
+    return result.rows;
   }
 
   async getById(id) {
-    const [rows] = await pool.query(
+    const result = await pool.query(
       `SELECT p.id, p.cliente, p.estado, p.total, p.created_at,
-              JSON_ARRAYAGG(
-                JSON_OBJECT(
-                  'productoId', dp.producto_id,
-                  'nombre', pr.nombre,
-                  'cantidad', dp.cantidad,
-                  'precioUnitario', dp.precio_unitario,
-                  'subtotal', dp.subtotal
-                )
+              COALESCE(
+                json_agg(
+                  json_build_object(
+                    'productoId', dp.producto_id,
+                    'nombre', pr.nombre,
+                    'cantidad', dp.cantidad,
+                    'precioUnitario', dp.precio_unitario,
+                    'subtotal', dp.subtotal
+                  )
+                ) FILTER (WHERE dp.id IS NOT NULL),
+                '[]'
               ) as items
        FROM pedidos p
        LEFT JOIN detalle_pedido dp ON p.id = dp.pedido_id
        LEFT JOIN productos pr ON dp.producto_id = pr.id
-       WHERE p.id = ?
+       WHERE p.id = $1
        GROUP BY p.id`,
       [id]
     );
 
-    if (rows.length === 0) return null;
+    if (result.rows.length === 0) return null;
 
-    const row = rows[0];
-    return {
-      ...row,
-      items: row.items ? JSON.parse(row.items) : []
-    };
+    return result.rows[0];
   }
 
   async updateStatus(id, estado) {
@@ -138,7 +136,7 @@ class OrderService {
     }
 
     await pool.query(
-      'UPDATE pedidos SET estado = ? WHERE id = ?',
+      'UPDATE pedidos SET estado = $1 WHERE id = $2',
       [estado, id]
     );
 

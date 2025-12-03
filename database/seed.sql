@@ -1,15 +1,17 @@
--- El Sabor Colombiano - Seed Data
-USE el_sabor_colombiano;
+-- El Sabor Colombiano - PostgreSQL Seed Data
+-- Run this after schema.sql
 
 -- Clear existing data
 DELETE FROM detalle_pedido;
 DELETE FROM pedidos;
 DELETE FROM productos;
+DELETE FROM usuarios;
 
--- Reset auto increment
-ALTER TABLE productos AUTO_INCREMENT = 1;
-ALTER TABLE pedidos AUTO_INCREMENT = 1;
-ALTER TABLE detalle_pedido AUTO_INCREMENT = 1;
+-- Reset sequences
+ALTER SEQUENCE productos_id_seq RESTART WITH 1;
+ALTER SEQUENCE pedidos_id_seq RESTART WITH 1;
+ALTER SEQUENCE detalle_pedido_id_seq RESTART WITH 1;
+ALTER SEQUENCE usuarios_id_seq RESTART WITH 1;
 
 -- Seed products
 INSERT INTO productos (nombre, categoria, descripcion, precio, stock, promocion, imagen_url) VALUES
@@ -27,3 +29,8 @@ INSERT INTO productos (nombre, categoria, descripcion, precio, stock, promocion,
 ('Café', 'bebida', 'Tostión media, sabor tradicional', 2500, 60, FALSE, '/img/cafe.jpg'),
 ('Café con leche', 'bebida', 'Suave y espumoso', 3000, 50, FALSE, '/img/cafe_leche.jpg'),
 ('Chocolate', 'bebida', 'Espeso y caliente', 3000, 40, FALSE, '/img/chocolate.jpg');
+
+-- Seed a default admin user (password: admin123)
+-- Note: This is a sample bcrypt hash for 'admin123' - regenerate for production
+INSERT INTO usuarios (nombre, email, contrasena_hash, rol) VALUES
+('Administrador', 'admin@elsaborcolombiano.com', '$2b$10$rIqXrKjJqmZvKZqZqZqZqOCyYvM1mJYXJYvMXJYvMXJYvMXJYvMXJ', 'admin');
