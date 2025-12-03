@@ -74,5 +74,4 @@ INSERT INTO productos (nombre, categoria, descripcion, precio, stock, promocion,
 ('Jugo de guayaba', 'bebida', 'Aromático y suave', 3500, 25, TRUE, '/img/jugo_guayaba.jpg'),
 ('Café', 'bebida', 'Tostión media, sabor tradicional', 2500, 60, FALSE, '/img/cafe.jpg'),
 ('Café con leche', 'bebida', 'Suave y espumoso', 3000, 50, FALSE, '/img/cafe_leche.jpg'),
-('Chocolate', 'bebida', 'Espeso y caliente', 3000, 40, FALSE, '/img/chocolate.jpg')
-ON CONFLICT DO NOTHING;
+('Chocolate', 'bebida', 'Espeso y caliente', 3000, 40, FALSE, '/img/chocolate.jpg');

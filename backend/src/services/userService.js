@@ -33,7 +33,9 @@ class UserService {
     // Check if email already exists
     const existing = await this.getByEmail(email);
     if (existing) {
-      throw new Error('El correo electrónico ya está registrado');
+      const error = new Error('El correo electrónico ya está registrado');
+      error.code = 'EMAIL_EXISTS';
+      throw error;
     }
 
     // Hash the password
@@ -61,8 +63,10 @@ class UserService {
     if (email !== undefined) {
       // Check if email is already taken by another user
       const existing = await this.getByEmail(email);
-      if (existing && existing.id !== parseInt(id)) {
-        throw new Error('El correo electrónico ya está en uso por otro usuario');
+      if (existing && existing.id !== parseInt(id, 10)) {
+        const error = new Error('El correo electrónico ya está en uso por otro usuario');
+        error.code = 'EMAIL_IN_USE';
+        throw error;
       }
       fields.push(`email = $${paramIndex++}`);
       values.push(email);

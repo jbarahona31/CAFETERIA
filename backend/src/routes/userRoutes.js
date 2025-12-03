@@ -1,9 +1,19 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const router = express.Router();
 const userController = require('../controllers/userController');
 
-// POST /api/usuarios/login - Login de usuario
-router.post('/login', userController.login);
+// Rate limiter for login endpoint to prevent brute force attacks
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 login attempts per windowMs
+  message: { error: 'Demasiados intentos de login. Por favor intente de nuevo en 15 minutos.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+// POST /api/usuarios/login - Login de usuario (rate limited)
+router.post('/login', loginLimiter, userController.login);
 
 // GET /api/usuarios - Lista todos los usuarios
 router.get('/', userController.getAll);

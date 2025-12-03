@@ -30,7 +30,7 @@ INSERT INTO productos (nombre, categoria, descripcion, precio, stock, promocion,
 ('Café con leche', 'bebida', 'Suave y espumoso', 3000, 50, FALSE, '/img/cafe_leche.jpg'),
 ('Chocolate', 'bebida', 'Espeso y caliente', 3000, 40, FALSE, '/img/chocolate.jpg');
 
--- Seed a default admin user (password: admin123)
--- Note: This is a sample bcrypt hash for 'admin123' - regenerate for production
-INSERT INTO usuarios (nombre, email, contrasena_hash, rol) VALUES
-('Administrador', 'admin@elsaborcolombiano.com', '$2b$10$rIqXrKjJqmZvKZqZqZqZqOCyYvM1mJYXJYvMXJYvMXJYvMXJYvMXJ', 'admin');
+-- NOTE: The following admin user is for DEVELOPMENT ONLY.
+-- DO NOT use this in production. Create admin users via the API with secure passwords.
+-- The hash below is an example placeholder - it will NOT work for authentication.
+-- For production: Use the /api/usuarios endpoint to create real users with bcrypt-hashed passwords.

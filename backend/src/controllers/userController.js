@@ -62,7 +62,7 @@ const userController = {
       res.status(201).json(user);
     } catch (error) {
       console.error('Error al crear usuario:', error);
-      if (error.message.includes('ya está registrado')) {
+      if (error.code === 'EMAIL_EXISTS') {
         return res.status(409).json({ error: error.message });
       }
       res.status(500).json({ error: 'Error al crear usuario' });
@@ -106,7 +106,7 @@ const userController = {
       res.json(user);
     } catch (error) {
       console.error('Error al actualizar usuario:', error);
-      if (error.message.includes('ya está en uso')) {
+      if (error.code === 'EMAIL_IN_USE') {
         return res.status(409).json({ error: error.message });
       }
       res.status(500).json({ error: 'Error al actualizar usuario' });
