@@ -2,18 +2,18 @@ const pool = require('../config/database');
 
 class ProductService {
   async getAll() {
-    const [rows] = await pool.query(
+    const result = await pool.query(
       'SELECT id, nombre, categoria, descripcion, precio, stock, promocion, imagen_url FROM productos ORDER BY categoria, nombre'
     );
-    return rows;
+    return result.rows;
   }
 
   async getById(id) {
-    const [rows] = await pool.query(
-      'SELECT id, nombre, categoria, descripcion, precio, stock, promocion, imagen_url FROM productos WHERE id = ?',
+    const result = await pool.query(
+      'SELECT id, nombre, categoria, descripcion, precio, stock, promocion, imagen_url FROM productos WHERE id = $1',
       [id]
     );
-    return rows[0] || null;
+    return result.rows[0] || null;
   }
 
   async update(id, data) {
@@ -21,29 +21,30 @@ class ProductService {
     
     const fields = [];
     const values = [];
+    let paramIndex = 1;
 
     if (nombre !== undefined) {
-      fields.push('nombre = ?');
+      fields.push(`nombre = $${paramIndex++}`);
       values.push(nombre);
     }
     if (descripcion !== undefined) {
-      fields.push('descripcion = ?');
+      fields.push(`descripcion = $${paramIndex++}`);
       values.push(descripcion);
     }
     if (precio !== undefined) {
-      fields.push('precio = ?');
+      fields.push(`precio = $${paramIndex++}`);
       values.push(precio);
     }
     if (stock !== undefined) {
-      fields.push('stock = ?');
+      fields.push(`stock = $${paramIndex++}`);
       values.push(stock);
     }
     if (promocion !== undefined) {
-      fields.push('promocion = ?');
+      fields.push(`promocion = $${paramIndex++}`);
       values.push(promocion);
     }
     if (imagen_url !== undefined) {
-      fields.push('imagen_url = ?');
+      fields.push(`imagen_url = $${paramIndex++}`);
       values.push(imagen_url);
     }
 
@@ -53,7 +54,7 @@ class ProductService {
 
     values.push(id);
     await pool.query(
-      `UPDATE productos SET ${fields.join(', ')} WHERE id = ?`,
+      `UPDATE productos SET ${fields.join(', ')} WHERE id = $${paramIndex}`,
       values
     );
 
@@ -84,7 +85,7 @@ class ProductService {
   async decrementStock(items) {
     for (const item of items) {
       await pool.query(
-        'UPDATE productos SET stock = stock - ? WHERE id = ?',
+        'UPDATE productos SET stock = stock - $1 WHERE id = $2',
         [item.cantidad, item.productoId]
       );
     }

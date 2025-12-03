@@ -1,5 +1,5 @@
 require('dotenv').config();
-const mysql = require('mysql2/promise');
+const { Pool } = require('pg');
 
 const seedProducts = [
   { nombre: 'Papas rellenas', categoria: 'comida', descripcion: 'Crujientes y doradas, con relleno casero', precio: 4500, stock: 20, promocion: false, imagen_url: '/img/papas.jpg' },
@@ -19,28 +19,36 @@ const seedProducts = [
 ];
 
 async function seed() {
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASS || '',
-    database: process.env.DB_NAME || 'el_sabor_colombiano'
+  const pool = new Pool({
+    host: process.env.PGHOST || 'localhost',
+    user: process.env.PGUSER || 'postgres',
+    password: process.env.PGPASSWORD || '',
+    database: process.env.PGDATABASE || 'el_sabor_colombiano',
+    port: parseInt(process.env.PGPORT || '5432', 10)
   });
+
+  const client = await pool.connect();
 
   try {
     console.log('🌱 Iniciando seed de datos...');
 
     // Clear existing data
-    await connection.query('DELETE FROM detalle_pedido');
-    await connection.query('DELETE FROM pedidos');
-    await connection.query('DELETE FROM productos');
+    await client.query('DELETE FROM detalle_pedido');
+    await client.query('DELETE FROM pedidos');
+    await client.query('DELETE FROM productos');
     
     console.log('✓ Datos anteriores eliminados');
 
+    // Reset sequences
+    await client.query('ALTER SEQUENCE productos_id_seq RESTART WITH 1');
+    await client.query('ALTER SEQUENCE pedidos_id_seq RESTART WITH 1');
+    await client.query('ALTER SEQUENCE detalle_pedido_id_seq RESTART WITH 1');
+
     // Insert products
     for (const product of seedProducts) {
-      await connection.query(
+      await client.query(
         `INSERT INTO productos (nombre, categoria, descripcion, precio, stock, promocion, imagen_url) 
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
         [product.nombre, product.categoria, product.descripcion, product.precio, product.stock, product.promocion, product.imagen_url]
       );
     }
@@ -52,7 +60,8 @@ async function seed() {
     console.error('❌ Error durante el seed:', error);
     process.exit(1);
   } finally {
-    await connection.end();
+    client.release();
+    await pool.end();
   }
 }
 

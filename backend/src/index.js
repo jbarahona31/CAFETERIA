@@ -6,6 +6,7 @@ const { Server } = require('socket.io');
 
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -34,6 +35,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api/productos', productRoutes);
 app.use('/api/pedidos', orderRoutes);
+app.use('/api/usuarios', userRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

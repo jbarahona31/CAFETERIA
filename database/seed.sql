@@ -1,15 +1,17 @@
--- El Sabor Colombiano - Seed Data
-USE el_sabor_colombiano;
+-- El Sabor Colombiano - PostgreSQL Seed Data
+-- Run this after schema.sql
 
 -- Clear existing data
 DELETE FROM detalle_pedido;
 DELETE FROM pedidos;
 DELETE FROM productos;
+DELETE FROM usuarios;
 
--- Reset auto increment
-ALTER TABLE productos AUTO_INCREMENT = 1;
-ALTER TABLE pedidos AUTO_INCREMENT = 1;
-ALTER TABLE detalle_pedido AUTO_INCREMENT = 1;
+-- Reset sequences
+ALTER SEQUENCE productos_id_seq RESTART WITH 1;
+ALTER SEQUENCE pedidos_id_seq RESTART WITH 1;
+ALTER SEQUENCE detalle_pedido_id_seq RESTART WITH 1;
+ALTER SEQUENCE usuarios_id_seq RESTART WITH 1;
 
 -- Seed products
 INSERT INTO productos (nombre, categoria, descripcion, precio, stock, promocion, imagen_url) VALUES
@@ -27,3 +29,8 @@ INSERT INTO productos (nombre, categoria, descripcion, precio, stock, promocion,
 ('Café', 'bebida', 'Tostión media, sabor tradicional', 2500, 60, FALSE, '/img/cafe.jpg'),
 ('Café con leche', 'bebida', 'Suave y espumoso', 3000, 50, FALSE, '/img/cafe_leche.jpg'),
 ('Chocolate', 'bebida', 'Espeso y caliente', 3000, 40, FALSE, '/img/chocolate.jpg');
+
+-- NOTE: The following admin user is for DEVELOPMENT ONLY.
+-- DO NOT use this in production. Create admin users via the API with secure passwords.
+-- The hash below is an example placeholder - it will NOT work for authentication.
+-- For production: Use the /api/usuarios endpoint to create real users with bcrypt-hashed passwords.
