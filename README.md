@@ -159,8 +159,7 @@ psql -d el_sabor_colombiano -f database/seed.sql
 ```bash
 cd backend
 npm install
-cp .env.example .env
-# Editar .env con tus credenciales de PostgreSQL
+# Editar .env con tus credenciales de PostgreSQL (archivo incluido en el repositorio)
 ```
 
 ### 4. Instalar dependencias del Frontend
@@ -168,8 +167,7 @@ cp .env.example .env
 ```bash
 cd ../frontend
 npm install
-cp .env.example .env
-# Editar .env si es necesario
+# Editar .env si es necesario (archivo incluido en el repositorio)
 ```
 
 ### 5. Agregar archivos de sonido
@@ -182,19 +180,21 @@ Coloca los siguientes archivos de audio en `frontend/public/sounds/`:
 
 ### Backend (.env)
 
+> ⚠️ **Importante:** Los archivos `.env` incluidos contienen valores de ejemplo. Asegúrate de cambiar `PGPASSWORD` y `JWT_SECRET` con valores seguros antes de usar en producción.
+
 ```env
 # PostgreSQL Database Configuration
 PGUSER=postgres
 PGHOST=localhost
 PGDATABASE=elsaborcolombiano
-PGPASSWORD=tu_contraseña
+PGPASSWORD=CHANGE_ME_YOUR_PASSWORD
 PGPORT=5432
 
 # Server Configuration
 PORT=4000
 
 # JWT Configuration
-JWT_SECRET=tu_clave_secreta
+JWT_SECRET=CHANGE_ME_YOUR_JWT_SECRET
 ```
 
 ### Frontend (.env)

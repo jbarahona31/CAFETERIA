@@ -5,8 +5,7 @@ node_modules/
 dist/
 build/
 
-# Environment files
-.env
+# Environment files (local overrides only)
 .env.local
 .env.*.local
 
