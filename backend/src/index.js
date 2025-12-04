@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
+const path = require('path');
 const { Server } = require('socket.io');
 
 const productRoutes = require('./routes/productRoutes');
@@ -25,6 +26,9 @@ app.set('io', io);
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve static files from frontend dist folder in production
+app.use(express.static(path.join(__dirname, '../dist')));
 
 // Request logging
 app.use((req, res, next) => {
@@ -71,7 +75,12 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Error interno del servidor' });
 });
 
-const PORT = process.env.PORT || 3001;
+// Catch-all route for SPA (must be after API routes)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
+});
+
+const PORT = process.env.PORT || 4000;
 
 server.listen(PORT, () => {
   console.log(`
