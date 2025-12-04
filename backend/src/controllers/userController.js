@@ -1,5 +1,9 @@
 const userService = require('../services/userService');
 
+// Valid roles for user registration and creation
+const VALID_ROLES = ['admin', 'mesero', 'cocina', 'cliente'];
+const REGISTRATION_ROLES = ['admin', 'mesero'];
+
 const userController = {
   async getAll(req, res) {
     try {
@@ -29,7 +33,7 @@ const userController = {
 
   async register(req, res) {
     try {
-      const { nombre, email, contrasena } = req.body;
+      const { nombre, email, contrasena, rol } = req.body;
 
       if (!nombre || !email || !contrasena) {
         return res.status(400).json({ 
@@ -50,8 +54,10 @@ const userController = {
         });
       }
 
-      // Default role is 'cliente' for public registration
-      const user = await userService.create({ nombre, email, contrasena, rol: 'cliente' });
+      // Validate role if provided - only allow admin or mesero for registration
+      const userRole = rol && REGISTRATION_ROLES.includes(rol) ? rol : 'mesero';
+
+      const user = await userService.create({ nombre, email, contrasena, rol: userRole });
       res.status(201).json({ 
         mensaje: 'Usuario registrado exitosamente',
         usuario: user 
@@ -89,10 +95,9 @@ const userController = {
       }
 
       // Validate role if provided
-      const validRoles = ['admin', 'mesero', 'cocina', 'cliente'];
-      if (rol && !validRoles.includes(rol)) {
+      if (rol && !VALID_ROLES.includes(rol)) {
         return res.status(400).json({ 
-          error: `Rol inválido. Roles válidos: ${validRoles.join(', ')}` 
+          error: `Rol inválido. Roles válidos: ${VALID_ROLES.join(', ')}` 
         });
       }
 
@@ -128,10 +133,9 @@ const userController = {
       }
 
       // Validate role if provided
-      const validRoles = ['admin', 'mesero', 'cocina', 'cliente'];
-      if (rol && !validRoles.includes(rol)) {
+      if (rol && !VALID_ROLES.includes(rol)) {
         return res.status(400).json({ 
-          error: `Rol inválido. Roles válidos: ${validRoles.join(', ')}` 
+          error: `Rol inválido. Roles válidos: ${VALID_ROLES.join(', ')}` 
         });
       }
 

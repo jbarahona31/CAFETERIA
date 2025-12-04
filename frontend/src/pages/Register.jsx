@@ -9,6 +9,7 @@ function Register() {
   const [email, setEmail] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [confirmarContrasena, setConfirmarContrasena] = useState('');
+  const [rol, setRol] = useState('mesero');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -32,7 +33,7 @@ function Register() {
 
     try {
       setLoading(true);
-      await api.register(nombre, email, contrasena);
+      await api.register(nombre, email, contrasena, rol);
       
       toast.success('¡Registro exitoso! Ahora puedes iniciar sesión');
       navigate('/login');
@@ -103,6 +104,20 @@ function Register() {
               disabled={loading}
               autoComplete="new-password"
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="rol">Tipo de usuario</label>
+            <select
+              id="rol"
+              value={rol}
+              onChange={(e) => setRol(e.target.value)}
+              disabled={loading}
+              className="form-select"
+            >
+              <option value="mesero">👨‍🍳 Mesero</option>
+              <option value="admin">👑 Administrador</option>
+            </select>
           </div>
 
           <button 

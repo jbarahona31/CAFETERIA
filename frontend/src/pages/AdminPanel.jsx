@@ -11,6 +11,7 @@ function AdminPanel() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -80,6 +81,24 @@ function AdminPanel() {
     return badges[rol] || { class: '', label: rol };
   };
 
+  const handleSaveProduct = async () => {
+    try {
+      await api.updateProduct(editingProduct.id, {
+        nombre: editingProduct.nombre,
+        descripcion: editingProduct.descripcion,
+        precio: editingProduct.precio,
+        imagen_url: editingProduct.imagen_url
+      });
+      toast.success('Producto actualizado');
+      setEditingProduct(null);
+      setImageError(false);
+      loadData();
+    } catch (error) {
+      console.error('Error al actualizar producto:', error);
+      toast.error('Error al actualizar producto');
+    }
+  };
+
   if (loading) {
     return (
       <div className="admin-panel">
@@ -127,6 +146,7 @@ function AdminPanel() {
               <thead>
                 <tr>
                   <th>ID</th>
+                  <th>Imagen</th>
                   <th>Nombre</th>
                   <th>Categoría</th>
                   <th>Precio</th>
@@ -139,6 +159,19 @@ function AdminPanel() {
                 {products.map(product => (
                   <tr key={product.id}>
                     <td>{product.id}</td>
+                    <td>
+                      <div className="product-image-preview">
+                        {product.imagen_url ? (
+                          <img 
+                            src={product.imagen_url} 
+                            alt={product.nombre}
+                            className="product-thumbnail"
+                          />
+                        ) : (
+                          <span className="no-image">📷</span>
+                        )}
+                      </div>
+                    </td>
                     <td>{product.nombre}</td>
                     <td>
                       <span className={`badge badge-${product.categoria}`}>
@@ -228,6 +261,96 @@ function AdminPanel() {
                 })}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Product Edit Modal */}
+      {editingProduct && (
+        <div className="modal-overlay" onClick={() => setEditingProduct(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>✏️ Editar Producto</h3>
+              <button 
+                className="modal-close"
+                onClick={() => setEditingProduct(null)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Nombre</label>
+                <input
+                  type="text"
+                  value={editingProduct.nombre}
+                  onChange={(e) => setEditingProduct({...editingProduct, nombre: e.target.value})}
+                  className="form-input"
+                />
+              </div>
+              <div className="form-group">
+                <label>Descripción</label>
+                <textarea
+                  value={editingProduct.descripcion || ''}
+                  onChange={(e) => setEditingProduct({...editingProduct, descripcion: e.target.value})}
+                  className="form-input form-textarea"
+                  rows="3"
+                />
+              </div>
+              <div className="form-group">
+                <label>Precio</label>
+                <input
+                  type="number"
+                  value={editingProduct.precio}
+                  onChange={(e) => setEditingProduct({...editingProduct, precio: parseFloat(e.target.value) || 0})}
+                  className="form-input"
+                  min="0"
+                  step="100"
+                />
+              </div>
+              <div className="form-group">
+                <label>📷 URL de Imagen</label>
+                <input
+                  type="url"
+                  value={editingProduct.imagen_url || ''}
+                  onChange={(e) => {
+                    setEditingProduct({...editingProduct, imagen_url: e.target.value});
+                    setImageError(false);
+                  }}
+                  className="form-input"
+                  placeholder="https://ejemplo.com/imagen.jpg"
+                />
+                {editingProduct.imagen_url && !imageError && (
+                  <div className="image-preview">
+                    <img 
+                      src={editingProduct.imagen_url} 
+                      alt="Vista previa"
+                      onError={() => setImageError(true)}
+                    />
+                  </div>
+                )}
+                {imageError && editingProduct.imagen_url && (
+                  <p className="image-error">⚠️ No se pudo cargar la imagen</p>
+                )}
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="btn btn-outline"
+                onClick={() => {
+                  setEditingProduct(null);
+                  setImageError(false);
+                }}
+              >
+                Cancelar
+              </button>
+              <button 
+                className="btn btn-primary"
+                onClick={handleSaveProduct}
+              >
+                💾 Guardar
+              </button>
+            </div>
           </div>
         </div>
       )}
