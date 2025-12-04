@@ -8,11 +8,11 @@ const getAuthHeaders = () => {
 
 export const api = {
   // Auth
-  async register(nombre, email, contrasena) {
+  async register(nombre, email, contrasena, rol) {
     const response = await fetch(`${API_URL}/usuarios/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre, email, contrasena })
+      body: JSON.stringify({ nombre, email, contrasena, rol })
     });
     
     if (!response.ok) {

@@ -62,6 +62,30 @@
   cursor: not-allowed;
 }
 
+.form-group select,
+.form-select {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: white;
+  cursor: pointer;
+}
+
+.form-group select:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(74, 44, 42, 0.1);
+}
+
+.form-group select:disabled,
+.form-select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
 .btn-login {
   width: 100%;
   padding: 0.875rem;
