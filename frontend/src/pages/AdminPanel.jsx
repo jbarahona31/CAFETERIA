@@ -11,6 +11,7 @@ function AdminPanel() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -78,6 +79,24 @@ function AdminPanel() {
       cliente: { class: 'badge-cliente', label: '👤 Cliente' }
     };
     return badges[rol] || { class: '', label: rol };
+  };
+
+  const handleSaveProduct = async () => {
+    try {
+      await api.updateProduct(editingProduct.id, {
+        nombre: editingProduct.nombre,
+        descripcion: editingProduct.descripcion,
+        precio: editingProduct.precio,
+        imagen_url: editingProduct.imagen_url
+      });
+      toast.success('Producto actualizado');
+      setEditingProduct(null);
+      setImageError(false);
+      loadData();
+    } catch (error) {
+      console.error('Error al actualizar producto:', error);
+      toast.error('Error al actualizar producto');
+    }
   };
 
   if (loading) {
@@ -294,46 +313,40 @@ function AdminPanel() {
                 <input
                   type="url"
                   value={editingProduct.imagen_url || ''}
-                  onChange={(e) => setEditingProduct({...editingProduct, imagen_url: e.target.value})}
+                  onChange={(e) => {
+                    setEditingProduct({...editingProduct, imagen_url: e.target.value});
+                    setImageError(false);
+                  }}
                   className="form-input"
                   placeholder="https://ejemplo.com/imagen.jpg"
                 />
-                {editingProduct.imagen_url && (
+                {editingProduct.imagen_url && !imageError && (
                   <div className="image-preview">
                     <img 
                       src={editingProduct.imagen_url} 
                       alt="Vista previa"
-                      onError={(e) => e.target.style.display = 'none'}
+                      onError={() => setImageError(true)}
                     />
                   </div>
+                )}
+                {imageError && editingProduct.imagen_url && (
+                  <p className="image-error">⚠️ No se pudo cargar la imagen</p>
                 )}
               </div>
             </div>
             <div className="modal-footer">
               <button 
                 className="btn btn-outline"
-                onClick={() => setEditingProduct(null)}
+                onClick={() => {
+                  setEditingProduct(null);
+                  setImageError(false);
+                }}
               >
                 Cancelar
               </button>
               <button 
                 className="btn btn-primary"
-                onClick={async () => {
-                  try {
-                    await api.updateProduct(editingProduct.id, {
-                      nombre: editingProduct.nombre,
-                      descripcion: editingProduct.descripcion,
-                      precio: editingProduct.precio,
-                      imagen_url: editingProduct.imagen_url
-                    });
-                    toast.success('Producto actualizado');
-                    setEditingProduct(null);
-                    loadData();
-                  } catch (error) {
-                    console.error('Error al actualizar producto:', error);
-                    toast.error('Error al actualizar producto');
-                  }
-                }}
+                onClick={handleSaveProduct}
               >
                 💾 Guardar
               </button>

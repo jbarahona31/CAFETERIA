@@ -312,6 +312,12 @@
   display: block;
 }
 
+.image-error {
+  margin-top: 0.5rem;
+  color: #dc3545;
+  font-size: 0.875rem;
+}
+
 .modal-footer {
   display: flex;
   justify-content: flex-end;
