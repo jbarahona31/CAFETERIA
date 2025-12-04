@@ -22,6 +22,15 @@ const registerLimiter = rateLimit({
   legacyHeaders: false
 });
 
+// Rate limiter for protected API endpoints
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: { error: 'Demasiadas solicitudes. Por favor intente de nuevo más tarde.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 // Public routes
 // POST /api/usuarios/register - Registrar nuevo usuario
 router.post('/register', registerLimiter, userController.register);
@@ -29,20 +38,20 @@ router.post('/register', registerLimiter, userController.register);
 // POST /api/usuarios/login - Login de usuario (rate limited)
 router.post('/login', loginLimiter, userController.login);
 
-// Protected routes - require authentication
+// Protected routes - require authentication and are rate limited
 // GET /api/usuarios - Lista todos los usuarios (admin only)
-router.get('/', authMiddleware, requireRole('admin'), userController.getAll);
+router.get('/', apiLimiter, authMiddleware, requireRole('admin'), userController.getAll);
 
 // GET /api/usuarios/:id - Obtiene un usuario por ID
-router.get('/:id', authMiddleware, userController.getById);
+router.get('/:id', apiLimiter, authMiddleware, userController.getById);
 
 // POST /api/usuarios - Crea un nuevo usuario (admin only)
-router.post('/', authMiddleware, requireRole('admin'), userController.create);
+router.post('/', apiLimiter, authMiddleware, requireRole('admin'), userController.create);
 
 // PUT /api/usuarios/:id - Actualiza un usuario (admin only)
-router.put('/:id', authMiddleware, requireRole('admin'), userController.update);
+router.put('/:id', apiLimiter, authMiddleware, requireRole('admin'), userController.update);
 
 // DELETE /api/usuarios/:id - Elimina un usuario (admin only)
-router.delete('/:id', authMiddleware, requireRole('admin'), userController.delete);
+router.delete('/:id', apiLimiter, authMiddleware, requireRole('admin'), userController.delete);
 
 module.exports = router;
