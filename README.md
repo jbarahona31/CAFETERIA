@@ -184,21 +184,24 @@ Coloca los siguientes archivos de audio en `frontend/public/sounds/`:
 
 ```env
 # PostgreSQL Database Configuration
-PGHOST=localhost
 PGUSER=postgres
+PGHOST=localhost
+PGDATABASE=elsaborcolombiano
 PGPASSWORD=tu_contraseña
-PGDATABASE=el_sabor_colombiano
 PGPORT=5432
 
 # Server Configuration
-PORT=3001
+PORT=4000
+
+# JWT Configuration
+JWT_SECRET=tu_clave_secreta
 ```
 
 ### Frontend (.env)
 
 ```env
-VITE_API_URL=http://localhost:3001/api
-VITE_SOCKET_URL=http://localhost:3001
+VITE_API_URL=http://localhost:4000/api
+VITE_SOCKET_URL=http://localhost:4000
 ```
 
 ## 🏃 Ejecución
@@ -217,7 +220,7 @@ cd frontend
 npm run dev
 ```
 
-El backend estará en `http://localhost:3001` y el frontend en `http://localhost:5173`
+El backend estará en `http://localhost:4000` y el frontend en `http://localhost:5173`
 
 ### Producción
 
