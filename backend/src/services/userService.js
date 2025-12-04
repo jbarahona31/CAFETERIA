@@ -1,7 +1,10 @@
 const pool = require('../config/database');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const SALT_ROUNDS = 10;
+const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_change_in_production';
+const JWT_EXPIRES_IN = '24h';
 
 class UserService {
   async getAll() {
@@ -117,7 +120,15 @@ class UserService {
 
     // Return user without password hash
     const { contrasena_hash, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.id, rol: user.rol },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
+    );
+
+    return { usuario: userWithoutPassword, token };
   }
 }
 

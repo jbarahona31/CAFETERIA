@@ -27,6 +27,44 @@ const userController = {
     }
   },
 
+  async register(req, res) {
+    try {
+      const { nombre, email, contrasena } = req.body;
+
+      if (!nombre || !email || !contrasena) {
+        return res.status(400).json({ 
+          error: 'Se requiere nombre, email y contrasena' 
+        });
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: 'Formato de email inválido' });
+      }
+
+      // Validate password length
+      if (contrasena.length < 6) {
+        return res.status(400).json({ 
+          error: 'La contraseña debe tener al menos 6 caracteres' 
+        });
+      }
+
+      // Default role is 'cliente' for public registration
+      const user = await userService.create({ nombre, email, contrasena, rol: 'cliente' });
+      res.status(201).json({ 
+        mensaje: 'Usuario registrado exitosamente',
+        usuario: user 
+      });
+    } catch (error) {
+      console.error('Error al registrar usuario:', error);
+      if (error.code === 'EMAIL_EXISTS') {
+        return res.status(409).json({ error: error.message });
+      }
+      res.status(500).json({ error: 'Error al registrar usuario' });
+    }
+  },
+
   async create(req, res) {
     try {
       const { nombre, email, contrasena, rol } = req.body;
@@ -51,7 +89,7 @@ const userController = {
       }
 
       // Validate role if provided
-      const validRoles = ['admin', 'mesero', 'cocina'];
+      const validRoles = ['admin', 'mesero', 'cocina', 'cliente'];
       if (rol && !validRoles.includes(rol)) {
         return res.status(400).json({ 
           error: `Rol inválido. Roles válidos: ${validRoles.join(', ')}` 
@@ -90,7 +128,7 @@ const userController = {
       }
 
       // Validate role if provided
-      const validRoles = ['admin', 'mesero', 'cocina'];
+      const validRoles = ['admin', 'mesero', 'cocina', 'cliente'];
       if (rol && !validRoles.includes(rol)) {
         return res.status(400).json({ 
           error: `Rol inválido. Roles válidos: ${validRoles.join(', ')}` 
@@ -139,13 +177,17 @@ const userController = {
         });
       }
 
-      const user = await userService.verifyPassword(email, contrasena);
+      const result = await userService.verifyPassword(email, contrasena);
       
-      if (!user) {
+      if (!result) {
         return res.status(401).json({ error: 'Credenciales inválidas' });
       }
 
-      res.json({ mensaje: 'Login exitoso', usuario: user });
+      res.json({ 
+        mensaje: 'Login exitoso', 
+        token: result.token,
+        usuario: result.usuario 
+      });
     } catch (error) {
       console.error('Error en login:', error);
       res.status(500).json({ error: 'Error en login' });
