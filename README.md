@@ -466,7 +466,62 @@ npm run seed
 
 ## 🚀 Despliegue
 
-### Backend (Recomendado: Railway, Render, VPS)
+### Despliegue en Railway (Recomendado)
+
+Este proyecto está configurado para desplegarse automáticamente en Railway con el frontend y backend juntos.
+
+#### 1. Crear cuenta y proyecto en Railway
+
+1. Ve a [Railway.app](https://railway.app) y crea una cuenta
+2. Crea un nuevo proyecto desde tu repositorio de GitHub
+3. Railway detectará automáticamente la configuración del proyecto
+
+#### 2. Agregar base de datos PostgreSQL
+
+1. En tu proyecto de Railway, haz clic en "New" → "Database" → "PostgreSQL"
+2. Railway creará automáticamente las variables de conexión
+
+#### 3. Configurar variables de entorno
+
+En la configuración del servicio en Railway, agrega las siguientes variables:
+
+```env
+# Base de datos (Railway las proporciona automáticamente al agregar PostgreSQL)
+DB_HOST=containers.railway.app
+DB_NAME=railway
+DB_PASSWORD=<tu_password_de_railway>
+DB_PORT=5432
+DB_USER=railway
+
+# Configuración del servidor
+NODE_ENV=production
+PORT=${{PORT}}
+
+# JWT (usa un valor seguro)
+JWT_SECRET=<tu_jwt_secret_seguro>
+
+# URL del frontend (para CORS)
+FRONTEND_URL=https://cafeteria-api.up.railway.app
+```
+
+#### 4. Despliegue automático
+
+Railway desplegará automáticamente cada vez que hagas `git push` a tu repositorio.
+
+El proyecto está configurado con `railway.json` para:
+- Instalar dependencias del proyecto completo
+- Compilar el frontend con `npm run build`
+- Servir el frontend estático desde el backend en producción
+
+#### URLs de producción
+
+- **API:** `https://cafeteria-api.up.railway.app/api`
+- **Frontend:** `https://cafeteria-api.up.railway.app`
+- **Socket.IO:** `https://cafeteria-api.up.railway.app`
+
+### Despliegue Alternativo
+
+#### Backend (Render, VPS)
 
 ```bash
 # Con PM2
@@ -474,14 +529,14 @@ npm install -g pm2
 pm2 start src/index.js --name "el-sabor-api"
 ```
 
-### Frontend (Recomendado: Vercel, Netlify)
+#### Frontend (Vercel, Netlify)
 
 ```bash
 npm run build
 # Subir carpeta dist/ al hosting
 ```
 
-### Base de datos (Recomendado: Supabase, Railway, Neon, RDS)
+### Base de datos (Supabase, Railway, Neon, RDS)
 
 Actualizar variables de entorno con credenciales del servicio de PostgreSQL gestionado.
 
