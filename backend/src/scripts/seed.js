@@ -1,5 +1,8 @@
 require('dotenv').config();
 const { Pool } = require('pg');
+const bcrypt = require('bcrypt');
+
+const SALT_ROUNDS = 10;
 
 const seedProducts = [
   { nombre: 'Papas rellenas', categoria: 'comida', descripcion: 'Crujientes y doradas, con relleno casero', precio: 4500, stock: 20, promocion: false, imagen_url: '/img/papas.jpg' },
@@ -16,6 +19,12 @@ const seedProducts = [
   { nombre: 'Café', categoria: 'bebida', descripcion: 'Tostión media, sabor tradicional', precio: 2500, stock: 60, promocion: false, imagen_url: '/img/cafe.jpg' },
   { nombre: 'Café con leche', categoria: 'bebida', descripcion: 'Suave y espumoso', precio: 3000, stock: 50, promocion: false, imagen_url: '/img/cafe_leche.jpg' },
   { nombre: 'Chocolate', categoria: 'bebida', descripcion: 'Espeso y caliente', precio: 3000, stock: 40, promocion: false, imagen_url: '/img/chocolate.jpg' }
+];
+
+// Initial users with plain text passwords - will be hashed during seed
+const seedUsers = [
+  { nombre: 'Administrador', email: 'admin@elsaborcolombiano.com', contrasena: 'admin123', rol: 'admin' },
+  { nombre: 'Mesero Principal', email: 'mesero@elsaborcolombiano.com', contrasena: 'mesero123', rol: 'mesero' }
 ];
 
 async function seed() {
@@ -36,6 +45,7 @@ async function seed() {
     await client.query('DELETE FROM detalle_pedido');
     await client.query('DELETE FROM pedidos');
     await client.query('DELETE FROM productos');
+    await client.query('DELETE FROM usuarios');
     
     console.log('✓ Datos anteriores eliminados');
 
@@ -43,6 +53,7 @@ async function seed() {
     await client.query('ALTER SEQUENCE productos_id_seq RESTART WITH 1');
     await client.query('ALTER SEQUENCE pedidos_id_seq RESTART WITH 1');
     await client.query('ALTER SEQUENCE detalle_pedido_id_seq RESTART WITH 1');
+    await client.query('ALTER SEQUENCE usuarios_id_seq RESTART WITH 1');
 
     // Insert products
     for (const product of seedProducts) {
@@ -54,6 +65,20 @@ async function seed() {
     }
 
     console.log(`✓ ${seedProducts.length} productos insertados`);
+
+    // Insert users with hashed passwords
+    for (const user of seedUsers) {
+      const contrasena_hash = await bcrypt.hash(user.contrasena, SALT_ROUNDS);
+      await client.query(
+        `INSERT INTO usuarios (nombre, email, contrasena_hash, rol) 
+         VALUES ($1, $2, $3, $4)`,
+        [user.nombre, user.email, contrasena_hash, user.rol]
+      );
+    }
+
+    console.log(`✓ ${seedUsers.length} usuarios insertados`);
+    console.log('  - Admin: admin@elsaborcolombiano.com / admin123');
+    console.log('  - Mesero: mesero@elsaborcolombiano.com / mesero123');
     console.log('✅ Seed completado exitosamente!');
 
   } catch (error) {

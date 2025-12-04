@@ -256,14 +256,73 @@ npm run preview
 
 ### Usuarios
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | `/api/usuarios` | Lista todos los usuarios |
-| GET | `/api/usuarios/:id` | Obtiene un usuario por ID |
-| POST | `/api/usuarios` | Crea un nuevo usuario |
-| PUT | `/api/usuarios/:id` | Actualiza un usuario |
-| DELETE | `/api/usuarios/:id` | Elimina un usuario |
-| POST | `/api/usuarios/login` | Autenticación de usuario |
+| Método | Endpoint | Descripción | Autenticación |
+|--------|----------|-------------|---------------|
+| POST | `/api/usuarios/register` | Registra un nuevo usuario (cliente) | No |
+| POST | `/api/usuarios/login` | Autenticación de usuario | No |
+| GET | `/api/usuarios` | Lista todos los usuarios | Admin |
+| GET | `/api/usuarios/:id` | Obtiene un usuario por ID | JWT |
+| POST | `/api/usuarios` | Crea un nuevo usuario con rol | Admin |
+| PUT | `/api/usuarios/:id` | Actualiza un usuario | Admin |
+| DELETE | `/api/usuarios/:id` | Elimina un usuario | Admin |
+
+#### Ejemplo de registro de usuario:
+
+```json
+POST /api/usuarios/register
+{
+  "nombre": "Juan Cliente",
+  "email": "juan@ejemplo.com",
+  "contrasena": "miPassword123"
+}
+```
+
+**Respuesta:**
+```json
+{
+  "mensaje": "Usuario registrado exitosamente",
+  "usuario": {
+    "id": 1,
+    "nombre": "Juan Cliente",
+    "email": "juan@ejemplo.com",
+    "rol": "cliente",
+    "created_at": "2024-01-01T00:00:00.000Z"
+  }
+}
+```
+
+#### Ejemplo de login:
+
+```json
+POST /api/usuarios/login
+{
+  "email": "juan@ejemplo.com",
+  "contrasena": "miPassword123"
+}
+```
+
+**Respuesta:**
+```json
+{
+  "mensaje": "Login exitoso",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "usuario": {
+    "id": 1,
+    "nombre": "Juan Cliente",
+    "email": "juan@ejemplo.com",
+    "rol": "cliente",
+    "created_at": "2024-01-01T00:00:00.000Z"
+  }
+}
+```
+
+#### Uso del Token JWT
+
+Para acceder a rutas protegidas, incluye el token en el header de la petición:
+
+```
+Authorization: Bearer <token>
+```
 
 #### Ejemplo de creación de pedido:
 
@@ -278,7 +337,7 @@ POST /api/pedidos
 }
 ```
 
-#### Ejemplo de creación de usuario:
+#### Ejemplo de creación de usuario (Admin):
 
 ```json
 POST /api/usuarios
@@ -290,24 +349,21 @@ POST /api/usuarios
 }
 ```
 
-#### Ejemplo de login:
-
-```json
-POST /api/usuarios/login
-{
-  "email": "juan@cafeteria.com",
-  "contrasena": "miPassword123"
-}
-```
-
 #### Estados válidos de pedido:
 - `pendiente` → `preparacion` → `listo` → `entregado`
 - `cancelado` (desde cualquier estado)
 
 #### Roles de usuario:
-- `admin` - Administrador del sistema
-- `mesero` - Personal de servicio
+- `admin` - Administrador del sistema (gestión de productos y usuarios)
+- `mesero` - Personal de servicio (panel de pedidos)
 - `cocina` - Personal de cocina
+- `cliente` - Clientes (menú y pedidos)
+
+#### Usuarios iniciales (seed):
+- **Admin:** admin@elsaborcolombiano.com / admin123
+- **Mesero:** mesero@elsaborcolombiano.com / mesero123
+
+> ⚠️ **Importante:** Cambiar estas contraseñas en producción.
 
 ## 🔌 Eventos Socket.IO
 

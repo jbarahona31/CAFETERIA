@@ -1,7 +1,15 @@
 const pool = require('../config/database');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const SALT_ROUNDS = 10;
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_EXPIRES_IN = '24h';
+
+// Fail fast if JWT_SECRET is not set in production
+if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET environment variable is required in production');
+}
 
 class UserService {
   async getAll() {
@@ -117,7 +125,15 @@ class UserService {
 
     // Return user without password hash
     const { contrasena_hash, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.id, rol: user.rol },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
+    );
+
+    return { usuario: userWithoutPassword, token };
   }
 }
 

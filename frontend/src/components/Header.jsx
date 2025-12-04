@@ -1,11 +1,19 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import './Header.css';
 
 function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { getItemCount } = useCart();
+  const { user, isAuthenticated, hasRole, hasAnyRole, logout } = useAuth();
   const itemCount = getItemCount();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <header className="header">
@@ -34,12 +42,40 @@ function Header() {
               <span className="cart-badge">{itemCount}</span>
             )}
           </Link>
-          <Link 
-            to="/mesero" 
-            className={`nav-link btn btn-secondary ${location.pathname === '/mesero' ? 'active' : ''}`}
-          >
-            👨‍🍳 Panel Mesero
-          </Link>
+          
+          {isAuthenticated() && hasAnyRole('admin', 'mesero') && (
+            <Link 
+              to="/mesero" 
+              className={`nav-link ${location.pathname === '/mesero' ? 'active' : ''}`}
+            >
+              👨‍🍳 Pedidos
+            </Link>
+          )}
+          
+          {isAuthenticated() && hasRole('admin') && (
+            <Link 
+              to="/admin" 
+              className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
+            >
+              ⚙️ Admin
+            </Link>
+          )}
+
+          {isAuthenticated() ? (
+            <div className="user-menu">
+              <span className="user-name">👤 {user?.nombre}</span>
+              <button onClick={handleLogout} className="btn btn-outline btn-sm">
+                Salir
+              </button>
+            </div>
+          ) : (
+            <Link 
+              to="/login" 
+              className={`nav-link btn btn-secondary ${location.pathname === '/login' ? 'active' : ''}`}
+            >
+              🔐 Ingresar
+            </Link>
+          )}
         </nav>
       </div>
     </header>
