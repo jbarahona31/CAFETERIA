@@ -495,13 +495,12 @@ DB_USER=railway
 
 # Configuración del servidor
 NODE_ENV=production
-PORT=${{PORT}}
 
 # JWT (usa un valor seguro)
 JWT_SECRET=<tu_jwt_secret_seguro>
 
-# URL del frontend (para CORS)
-FRONTEND_URL=https://cafeteria-api.up.railway.app
+# URL del frontend (para CORS) - Reemplaza con tu URL de Railway
+FRONTEND_URL=https://<tu-proyecto>.up.railway.app
 ```
 
 #### 4. Despliegue automático
@@ -515,9 +514,11 @@ El proyecto está configurado con `railway.json` para:
 
 #### URLs de producción
 
-- **API:** `https://cafeteria-api.up.railway.app/api`
-- **Frontend:** `https://cafeteria-api.up.railway.app`
-- **Socket.IO:** `https://cafeteria-api.up.railway.app`
+Reemplaza `<tu-proyecto>` con el nombre de tu proyecto en Railway:
+
+- **API:** `https://<tu-proyecto>.up.railway.app/api`
+- **Frontend:** `https://<tu-proyecto>.up.railway.app`
+- **Socket.IO:** `https://<tu-proyecto>.up.railway.app`
 
 ### Despliegue Alternativo
 
