@@ -28,7 +28,9 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static files from frontend dist folder in production
-app.use(express.static(path.join(__dirname, '../dist')));
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../dist')));
+}
 
 // Request logging
 app.use((req, res, next) => {
@@ -76,9 +78,17 @@ app.use((err, req, res, next) => {
 });
 
 // Catch-all route for SPA (must be after API routes)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../dist/index.html'));
-});
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    const indexPath = path.join(__dirname, '../dist/index.html');
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        console.error('[Error] Failed to serve index.html:', err);
+        res.status(500).send('Error loading application');
+      }
+    });
+  });
+}
 
 const PORT = process.env.PORT || 4000;
 
