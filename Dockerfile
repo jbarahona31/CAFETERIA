@@ -6,10 +6,12 @@ WORKDIR /app
 COPY . .
 
 # Instalamos dependencias del frontend incluyendo devDependencies (necesarias para Vite)
-RUN npm install --prefix frontend --include=dev
+WORKDIR /app/frontend
+RUN npm install
 
 # Compilamos el frontend
-RUN npm run build --prefix frontend
+RUN npm run build
+WORKDIR /app
 
 # Etapa de producción
 FROM node:18 AS production
@@ -22,7 +24,7 @@ RUN npm install --prefix backend --omit=dev
 COPY backend ./backend
 
 # Copiamos el frontend ya compilado
-COPY --from=build /app/frontend/dist ./backend/dist
+COPY --from=build /app/backend/dist ./backend/dist
 
 # Variables de entorno
 ENV NODE_ENV=production
