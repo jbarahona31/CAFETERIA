@@ -15,16 +15,16 @@ WORKDIR /app
 
 # Etapa de producción
 FROM node:18 AS production
-WORKDIR /app
+WORKDIR /app/backend
 
 # Copiamos solo lo necesario del backend
-COPY backend/package*.json ./backend/
-RUN npm install --prefix backend --omit=dev
+COPY backend/package*.json ./
+RUN npm install --omit=dev
 
-COPY backend ./backend
+COPY backend ./
 
 # Copiamos el frontend ya compilado
-COPY --from=build /app/backend/dist ./backend/dist
+COPY --from=build /app/backend/dist ./dist
 
 # Variables de entorno
 ENV NODE_ENV=production
@@ -34,4 +34,4 @@ ENV PORT=4000
 EXPOSE 4000
 
 # Comando de inicio
-CMD ["npm", "start", "--prefix", "backend"]
+CMD ["npm", "start"]
