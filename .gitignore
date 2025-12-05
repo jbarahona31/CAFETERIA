@@ -5,9 +5,11 @@ node_modules/
 dist/
 build/
 
-# Environment files (local overrides only)
+# Environment files with secrets (keep .env.example and .env.production for reference)
+.env
 .env.local
 .env.*.local
+backend/.env
 
 # IDE
 .idea/
