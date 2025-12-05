@@ -7,7 +7,10 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD || process.env.PGPASSWORD || '',
   database: process.env.DB_NAME || process.env.PGDATABASE || 'el_sabor_colombiano',
   port: parseInt(process.env.DB_PORT || process.env.PGPORT || '5432', 10),
-  max: 10
+  max: 10,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 module.exports = pool;
