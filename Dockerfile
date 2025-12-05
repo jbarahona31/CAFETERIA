@@ -5,8 +5,8 @@ WORKDIR /app
 # Copiamos todo el proyecto
 COPY . .
 
-# Instalamos dependencias incluyendo devDependencies (necesarias para Vite)
-RUN npm install --include=dev
+# Instalamos dependencias del frontend incluyendo devDependencies (necesarias para Vite)
+RUN npm install --prefix frontend --include=dev
 
 # Compilamos el frontend
 RUN npm run build --prefix frontend
