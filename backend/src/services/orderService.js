@@ -8,7 +8,7 @@ class OrderService {
     try {
       await client.query('BEGIN');
 
-      // Calculate total
+      // Calcular total y preparar detalles
       let total = 0;
       const detailItems = [];
 
@@ -25,12 +25,12 @@ class OrderService {
           productoId: item.productoId,
           cantidad: item.cantidad,
           precioUnitario: product.precio,
-          subtotal: subtotal,
+          subtotal,
           nombre: product.nombre
         });
       }
 
-      // Create order
+      // Crear pedido
       const orderResult = await client.query(
         'INSERT INTO pedidos (cliente, estado, total) VALUES ($1, $2, $3) RETURNING id',
         [cliente, 'pendiente', total]
@@ -38,7 +38,7 @@ class OrderService {
       
       const pedidoId = orderResult.rows[0].id;
 
-      // Create order details
+      // Crear detalle del pedido
       for (const detail of detailItems) {
         await client.query(
           'INSERT INTO detalle_pedido (pedido_id, producto_id, cantidad, precio_unitario, subtotal) VALUES ($1, $2, $3, $4, $5)',
@@ -46,7 +46,7 @@ class OrderService {
         );
       }
 
-      // Decrement stock
+      // Actualizar stock
       await productService.decrementStock(items);
 
       await client.query('COMMIT');
@@ -96,7 +96,6 @@ class OrderService {
     query += ' GROUP BY p.id ORDER BY p.created_at DESC';
 
     const result = await pool.query(query, params);
-    
     return result.rows;
   }
 
@@ -124,7 +123,6 @@ class OrderService {
     );
 
     if (result.rows.length === 0) return null;
-
     return result.rows[0];
   }
 

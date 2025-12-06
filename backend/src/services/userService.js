@@ -6,12 +6,13 @@ const SALT_ROUNDS = 10;
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = '24h';
 
-// Fail fast if JWT_SECRET is not set in production
+// Fail fast si JWT_SECRET no está definido en producción
 if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
   throw new Error('JWT_SECRET environment variable is required in production');
 }
 
 class UserService {
+  // Obtener todos los usuarios
   async getAll() {
     const result = await pool.query(
       'SELECT id, nombre, email, rol, created_at FROM usuarios ORDER BY created_at DESC'
@@ -19,6 +20,7 @@ class UserService {
     return result.rows;
   }
 
+  // Obtener usuario por ID
   async getById(id) {
     const result = await pool.query(
       'SELECT id, nombre, email, rol, created_at FROM usuarios WHERE id = $1',
@@ -27,6 +29,7 @@ class UserService {
     return result.rows[0] || null;
   }
 
+  // Obtener usuario por email
   async getByEmail(email) {
     const result = await pool.query(
       'SELECT id, nombre, email, contrasena_hash, rol, created_at FROM usuarios WHERE email = $1',
@@ -35,10 +38,11 @@ class UserService {
     return result.rows[0] || null;
   }
 
+  // Crear usuario nuevo
   async create(data) {
     const { nombre, email, contrasena, rol = 'mesero' } = data;
 
-    // Check if email already exists
+    // Validar si el correo ya existe
     const existing = await this.getByEmail(email);
     if (existing) {
       const error = new Error('El correo electrónico ya está registrado');
@@ -46,17 +50,20 @@ class UserService {
       throw error;
     }
 
-    // Hash the password
+    // Hashear contraseña
     const contrasena_hash = await bcrypt.hash(contrasena, SALT_ROUNDS);
 
     const result = await pool.query(
-      'INSERT INTO usuarios (nombre, email, contrasena_hash, rol) VALUES ($1, $2, $3, $4) RETURNING id, nombre, email, rol, created_at',
+      `INSERT INTO usuarios (nombre, email, contrasena_hash, rol) 
+       VALUES ($1, $2, $3, $4) 
+       RETURNING id, nombre, email, rol, created_at`,
       [nombre, email, contrasena_hash, rol]
     );
 
     return result.rows[0];
   }
 
+  // Actualizar usuario
   async update(id, data) {
     const { nombre, email, contrasena, rol } = data;
     
@@ -69,7 +76,7 @@ class UserService {
       values.push(nombre);
     }
     if (email !== undefined) {
-      // Check if email is already taken by another user
+      // Validar si el correo ya está en uso por otro usuario
       const existing = await this.getByEmail(email);
       if (existing && existing.id !== parseInt(id, 10)) {
         const error = new Error('El correo electrónico ya está en uso por otro usuario');
@@ -90,7 +97,7 @@ class UserService {
     }
 
     if (fields.length === 0) {
-      return null;
+      return null; // No hay campos para actualizar
     }
 
     values.push(id);
@@ -102,6 +109,7 @@ class UserService {
     return this.getById(id);
   }
 
+  // Eliminar usuario
   async delete(id) {
     const user = await this.getById(id);
     if (!user) {
@@ -112,6 +120,7 @@ class UserService {
     return user;
   }
 
+  // Verificar contraseña y generar JWT
   async verifyPassword(email, contrasena) {
     const user = await this.getByEmail(email);
     if (!user) {
@@ -123,10 +132,10 @@ class UserService {
       return null;
     }
 
-    // Return user without password hash
+    // Excluir hash de la respuesta
     const { contrasena_hash, ...userWithoutPassword } = user;
     
-    // Generate JWT token
+    // Generar token JWT
     const token = jwt.sign(
       { id: user.id, rol: user.rol },
       JWT_SECRET,

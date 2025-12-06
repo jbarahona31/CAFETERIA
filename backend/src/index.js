@@ -5,6 +5,10 @@ const http = require('http');
 const path = require('path');
 const { Server } = require('socket.io');
 
+// Importar conexión a la base de datos
+const pool = require('./config/database');
+
+// Importar rutas
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -48,6 +52,17 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'El Sabor Colombiano API is running' });
 });
 
+// Test DB connection
+app.get('/api/test-db', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT NOW()');
+    res.json({ time: result.rows[0] });
+  } catch (err) {
+    console.error('[DB Error]', err);
+    res.status(500).json({ error: 'Error conectando a la base de datos' });
+  }
+});
+
 // Socket.IO events
 io.on('connection', (socket) => {
   console.log(`[Socket] Cliente conectado: ${socket.id}`);
@@ -62,8 +77,8 @@ io.on('connection', (socket) => {
   socket.on('cambiar_estado', async (data) => {
     const { pedidoId, estado } = data;
     console.log(`[Socket] Solicitud cambiar_estado: pedido ${pedidoId} -> ${estado}`);
-    // Note: Status changes should be done through the REST API for consistency
-    // This event is for real-time updates only
+    // Nota: Los cambios de estado deben hacerse vía REST API para consistencia
+    // Este evento es solo para actualizaciones en tiempo real
   });
 
   socket.on('disconnect', () => {
@@ -95,9 +110,9 @@ const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
   console.log(`
 ╔═══════════════════════════════════════════════════════════╗
-║      🍽️  El Sabor Colombiano - API Server                 ║
+║      🍽️  El Sabor Colombiano - API Server                ║
 ║                                                           ║
-║   Server running on: http://localhost:${PORT}               ║
+║   Server running on: http://localhost:${PORT}             ║
 ║   Socket.IO enabled for real-time updates                 ║
 ╚═══════════════════════════════════════════════════════════╝
   `);

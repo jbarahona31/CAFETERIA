@@ -1,21 +1,28 @@
 const pool = require('../config/database');
 
 class ProductService {
+  // Obtener todos los productos
   async getAll() {
     const result = await pool.query(
-      'SELECT id, nombre, categoria, descripcion, precio, stock, promocion, imagen_url FROM productos ORDER BY categoria, nombre'
+      `SELECT id, nombre, categoria, descripcion, precio, stock, promocion, imagen_url 
+       FROM productos 
+       ORDER BY categoria, nombre`
     );
     return result.rows;
   }
 
+  // Obtener producto por ID
   async getById(id) {
     const result = await pool.query(
-      'SELECT id, nombre, categoria, descripcion, precio, stock, promocion, imagen_url FROM productos WHERE id = $1',
+      `SELECT id, nombre, categoria, descripcion, precio, stock, promocion, imagen_url 
+       FROM productos 
+       WHERE id = $1`,
       [id]
     );
     return result.rows[0] || null;
   }
 
+  // Actualizar producto dinámicamente
   async update(id, data) {
     const { nombre, descripcion, precio, stock, promocion, imagen_url } = data;
     
@@ -49,7 +56,7 @@ class ProductService {
     }
 
     if (fields.length === 0) {
-      return null;
+      return null; // No hay campos para actualizar
     }
 
     values.push(id);
@@ -61,6 +68,7 @@ class ProductService {
     return this.getById(id);
   }
 
+  // Verificar stock de varios productos
   async checkStock(items) {
     const outOfStock = [];
     
@@ -82,6 +90,7 @@ class ProductService {
     return outOfStock;
   }
 
+  // Decrementar stock después de un pedido
   async decrementStock(items) {
     for (const item of items) {
       await pool.query(
