@@ -6,15 +6,18 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "seed": "node src/scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "test-db": "node test-db.js"
   },
   "keywords": [
     "cafeteria",
     "menu",
     "api",
-    "socket.io"
+    "socket.io",
+    "postgresql",
+    "railway"
   ],
-  "author": "",
+  "author": "Junior",
   "license": "MIT",
   "dependencies": {
     "bcrypt": "^6.0.0",
