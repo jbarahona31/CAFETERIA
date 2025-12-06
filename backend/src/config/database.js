@@ -1,16 +1,27 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-const pool = new Pool({
-  host: process.env.DB_HOST || process.env.PGHOST || 'localhost',
-  user: process.env.DB_USER || process.env.PGUSER || 'postgres',
-  password: process.env.DB_PASSWORD || process.env.PGPASSWORD || '',
-  database: process.env.DB_NAME || process.env.PGDATABASE || 'el_sabor_colombiano',
-  port: parseInt(process.env.DB_PORT || process.env.PGPORT || '5432', 10),
-  max: 10,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+let pool;
+
+if (process.env.DATABASE_URL) {
+  // 🚀 Simplificado para Railway (usa DATABASE_URL)
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false, // Railway requiere SSL
+    },
+  });
+} else {
+  // 🖥️ Configuración detallada para desarrollo local
+  pool = new Pool({
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'el_sabor_colombiano',
+    port: parseInt(process.env.DB_PORT || '5432', 10),
+    max: 10,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  });
+}
 
 module.exports = pool;
