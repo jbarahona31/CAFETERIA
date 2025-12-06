@@ -11,7 +11,6 @@ RUN npm install
 
 # Compilamos el frontend
 RUN npm run build
-WORKDIR /app
 
 # Etapa de producción
 FROM node:18 AS production
@@ -24,7 +23,7 @@ RUN npm install --omit=dev
 COPY backend ./
 
 # Copiamos el frontend ya compilado
-COPY --from=build /app/backend/dist ./dist
+COPY --from=build /app/frontend/dist ./dist
 
 # Variables de entorno
 ENV NODE_ENV=production
