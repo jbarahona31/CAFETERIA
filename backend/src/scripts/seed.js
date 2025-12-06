@@ -1,5 +1,4 @@
-require('dotenv').config();
-const { Pool } = require('pg');
+const pool = require('../config/database');
 const bcrypt = require('bcrypt');
 
 const SALT_ROUNDS = 10;
@@ -28,14 +27,6 @@ const seedUsers = [
 ];
 
 async function seed() {
-  const pool = new Pool({
-    host: process.env.PGHOST || 'localhost',
-    user: process.env.PGUSER || 'postgres',
-    password: process.env.PGPASSWORD || '',
-    database: process.env.PGDATABASE || 'el_sabor_colombiano',
-    port: parseInt(process.env.PGPORT || '5432', 10)
-  });
-
   const client = await pool.connect();
 
   try {
