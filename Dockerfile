@@ -23,7 +23,8 @@ RUN npm install --omit=dev
 COPY backend ./
 
 # Copiamos el frontend ya compilado
-COPY --from=build /app/frontend/dist ./dist
+COPY --from=build /app/backend/dist ./dist
+
 
 # Variables de entorno
 ENV NODE_ENV=production
