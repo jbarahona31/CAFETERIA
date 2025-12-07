@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 // Registrar usuario
 exports.register = async (req, res) => {
   try {
-    const { nombre, email, password, rol } = req.body;
+    const { nombre, correo, contraseña, rol } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -24,16 +24,16 @@ exports.register = async (req, res) => {
 // Login usuario
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { correo, contraseña } = req.body;
 
-    const result = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+    const result = await pool.query('SELECT * FROM usuarios WHERE correo = $1', [correo]);
     const user = result.rows[0];
 
     if (!user) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    const validPassword = await bcrypt.compare(password, user.password);
+    const validPassword = await bcrypt.compare(contraseña, user.contraseña);
     if (!validPassword) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
@@ -54,7 +54,7 @@ exports.login = async (req, res) => {
 // Obtener todos los usuarios
 exports.getAll = async (req, res) => {
   try {
-    const result = await pool.query('SELECT id, nombre, email, rol FROM usuarios');
+    const result = await pool.query('SELECT id, nombre, correo, rol FROM usuarios');
     res.json(result.rows);
   } catch (err) {
     console.error('[DB Error]', err);
@@ -66,7 +66,7 @@ exports.getAll = async (req, res) => {
 exports.getById = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await pool.query('SELECT id, nombre, email, rol FROM usuarios WHERE id = $1', [id]);
+    const result = await pool.query('SELECT id, nombre, correo, rol FROM usuarios WHERE id = $1', [id]);
 
     if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -86,8 +86,8 @@ exports.create = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
-      'INSERT INTO usuarios (nombre, email, password, rol) VALUES ($1, $2, $3, $4) RETURNING *',
-      [nombre, email, hashedPassword, rol || 'cliente']
+      'INSERT INTO usuarios (nombre, correo, contraseña, rol) VALUES ($1, $2, $3, $4) RETURNING *',
+      [nombre, correo, hashedPassword, rol || 'cliente']
     );
 
     res.status(201).json(result.rows[0]);
@@ -101,18 +101,18 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, email, password, rol } = req.body;
+    const { nombre, correo, contraseña, rol } = req.body;
 
     let hashedPassword = null;
-    if (password) {
-      hashedPassword = await bcrypt.hash(password, 10);
+    if (contraseña) {
+      hashedPassword = await bcrypt.hash(contraseña, 10);
     }
 
     const result = await pool.query(
       `UPDATE usuarios 
-       SET nombre = $1, email = $2, password = COALESCE($3, password), rol = $4 
+       SET nombre = $1, correo = $2, contraseña = COALESCE($3, contraseña), rol = $4 
        WHERE id = $5 RETURNING *`,
-      [nombre, email, hashedPassword, rol, id]
+      [nombre, correo, hashedPassword, rol, id]
     );
 
     if (result.rowCount === 0) {
