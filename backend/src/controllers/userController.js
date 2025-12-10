@@ -58,7 +58,7 @@ exports.login = async (req, res) => {
     );
 
     // Don't send password hash back to client
-    const { contraseña: password, ...userWithoutPassword } = user;
+    const { contraseña: _password, ...userWithoutPassword } = user;
     res.json({ token, user: userWithoutPassword });
   } catch (err) {
     console.error('[DB Error]', err);

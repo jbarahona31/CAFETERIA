@@ -1,6 +1,8 @@
 const pool = require('../config/database');
 
 // Obtener ventas diarias
+// Note: Order states used in the system: 'pendiente', 'preparando', 'listo', 'entregado', 'completado'
+// Only 'completado' and 'entregado' orders are counted as completed sales
 exports.getDailySales = async (req, res) => {
   try {
     console.log('[SalesController] Fetching daily sales...');
