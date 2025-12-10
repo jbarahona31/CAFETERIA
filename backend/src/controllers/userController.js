@@ -7,6 +7,11 @@ exports.register = async (req, res) => {
   try {
     const { nombre, email, contrasena, rol } = req.body;
 
+    // Validate required fields
+    if (!nombre || !email || !contrasena) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+    }
+
     const hashedPassword = await bcrypt.hash(contrasena, 10);
 
     const result = await pool.query(
@@ -29,7 +34,12 @@ exports.login = async (req, res) => {
   try {
     const { email, contrasena } = req.body;
 
-    const result = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+    // Validate required fields
+    if (!email || !contrasena) {
+      return res.status(400).json({ error: 'Email y contraseña son obligatorios' });
+    }
+
+    const result = await pool.query('SELECT id, nombre, email, contrasena_hash, rol, created_at FROM usuarios WHERE email = $1', [email]);
     const user = result.rows[0];
 
     if (!user) {
