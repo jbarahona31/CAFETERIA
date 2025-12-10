@@ -8,7 +8,7 @@ exports.register = async (req, res) => {
     const { nombre, email, contrasena, rol } = req.body;
 
     // Validate required fields
-    if (!nombre || !email || !contrasena) {
+    if (!nombre?.trim() || !email?.trim() || !contrasena?.trim()) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
 
@@ -35,7 +35,7 @@ exports.login = async (req, res) => {
     const { email, contrasena } = req.body;
 
     // Validate required fields
-    if (!email || !contrasena) {
+    if (!email?.trim() || !contrasena?.trim()) {
       return res.status(400).json({ error: 'Email y contraseña son obligatorios' });
     }
 
