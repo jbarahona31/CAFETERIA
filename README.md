@@ -470,6 +470,8 @@ npm run seed
 
 Este proyecto está configurado para desplegarse automáticamente en Railway con el frontend y backend juntos.
 
+🚀 **Inicio Rápido**: Ver [RAILWAY_QUICK_START.md](./RAILWAY_QUICK_START.md) para desplegar en 5 minutos
+
 #### 1. Crear cuenta y proyecto en Railway
 
 1. Ve a [Railway.app](https://railway.app) y crea una cuenta

@@ -1,5 +1,7 @@
 # Guía de Despliegue en Railway
 
+> 🚀 **¿Primera vez?** Ver [RAILWAY_QUICK_START.md](./RAILWAY_QUICK_START.md) para una guía rápida de 5 minutos
+
 ## Pasos para Desplegar en Railway
 
 ### 1. Configurar PostgreSQL en Railway
