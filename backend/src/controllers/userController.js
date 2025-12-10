@@ -5,18 +5,18 @@ const jwt = require('jsonwebtoken');
 // Registrar usuario
 exports.register = async (req, res) => {
   try {
-    const { nombre, email, contrasena, rol } = req.body;
+    const { nombre, correo, contraseña, rol } = req.body;
 
     // Validate required fields
-    if (!nombre?.trim() || !email?.trim() || !contrasena?.trim()) {
+    if (!nombre?.trim() || !correo?.trim() || !contraseña?.trim()) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
 
-    const hashedPassword = await bcrypt.hash(contrasena, 10);
+    const hashedPassword = await bcrypt.hash(contraseña, 10);
 
     const result = await pool.query(
       'INSERT INTO usuarios (nombre, correo, contraseña, rol) VALUES ($1, $2, $3, $4) RETURNING id, nombre, correo, rol, created_at',
-      [nombre, email, hashedPassword, rol || 'cliente']
+      [nombre, correo, hashedPassword, rol || 'cliente']
     );
 
     res.status(201).json(result.rows[0]);
@@ -32,33 +32,33 @@ exports.register = async (req, res) => {
 // Login usuario
 exports.login = async (req, res) => {
   try {
-    const { email, contrasena } = req.body;
+    const { correo, contraseña } = req.body;
 
     // Validate required fields
-    if (!email?.trim() || !contrasena?.trim()) {
-      return res.status(400).json({ error: 'Email y contraseña son obligatorios' });
+    if (!correo?.trim() || !contraseña?.trim()) {
+      return res.status(400).json({ error: 'Correo y contraseña son obligatorios' });
     }
 
-    const result = await pool.query('SELECT id, nombre, correo, contraseña, rol, created_at FROM usuarios WHERE correo = $1', [email]);
+    const result = await pool.query('SELECT id, nombre, correo, contraseña, rol, created_at FROM usuarios WHERE correo = $1', [correo]);
     const user = result.rows[0];
 
     if (!user) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    const validPassword = await bcrypt.compare(contrasena, user.contraseña);
+    const validPassword = await bcrypt.compare(contraseña, user.contraseña);
     if (!validPassword) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
     const token = jwt.sign(
       { id: user.id, rol: user.rol },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || 'default-secret-key-change-in-production',
       { expiresIn: '1h' }
     );
 
     // Don't send password hash back to client
-    const { contraseña, ...userWithoutPassword } = user;
+    const { contraseña: _password, ...userWithoutPassword } = user;
     res.json({ token, user: userWithoutPassword });
   } catch (err) {
     console.error('[DB Error]', err);
@@ -97,12 +97,12 @@ exports.getById = async (req, res) => {
 // Crear usuario (admin)
 exports.create = async (req, res) => {
   try {
-    const { nombre, email, contrasena, rol } = req.body;
-    const hashedPassword = await bcrypt.hash(contrasena, 10);
+    const { nombre, correo, contraseña, rol } = req.body;
+    const hashedPassword = await bcrypt.hash(contraseña, 10);
 
     const result = await pool.query(
       'INSERT INTO usuarios (nombre, correo, contraseña, rol) VALUES ($1, $2, $3, $4) RETURNING id, nombre, correo, rol, created_at',
-      [nombre, email, hashedPassword, rol || 'cliente']
+      [nombre, correo, hashedPassword, rol || 'cliente']
     );
 
     res.status(201).json(result.rows[0]);
@@ -119,18 +119,18 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, email, contrasena, rol } = req.body;
+    const { nombre, correo, contraseña, rol } = req.body;
 
     let hashedPassword = null;
-    if (contrasena) {
-      hashedPassword = await bcrypt.hash(contrasena, 10);
+    if (contraseña) {
+      hashedPassword = await bcrypt.hash(contraseña, 10);
     }
 
     const result = await pool.query(
       `UPDATE usuarios 
        SET nombre = $1, correo = $2, contraseña = COALESCE($3, contraseña), rol = $4 
        WHERE id = $5 RETURNING id, nombre, correo, rol, created_at`,
-      [nombre, email, hashedPassword, rol, id]
+      [nombre, correo, hashedPassword, rol, id]
     );
 
     if (result.rowCount === 0) {

@@ -44,6 +44,12 @@ Sistema completo de menú digital para cafetería con gestión de pedidos en tie
 - 🔔 Alertas sonoras para nuevos pedidos
 - 📊 Filtrado por estado de pedidos
 
+### Para Administradores
+- 📊 Reporte de ventas diarias
+- 💰 Visualización de ingresos totales
+- 📈 Análisis de productos más vendidos
+- 👥 Gestión completa de usuarios y productos
+
 ### Características Técnicas
 - 🚀 Comunicación en tiempo real con Socket.IO
 - 🔒 Validación de stock antes de crear pedidos
@@ -78,10 +84,12 @@ el-sabor-colombiano/
 │   │   ├── controllers/
 │   │   │   ├── orderController.js
 │   │   │   ├── productController.js
+│   │   │   ├── salesController.js
 │   │   │   └── userController.js
 │   │   ├── routes/
 │   │   │   ├── orderRoutes.js
 │   │   │   ├── productRoutes.js
+│   │   │   ├── salesRoutes.js
 │   │   │   └── userRoutes.js
 │   │   ├── services/
 │   │   │   ├── orderService.js
@@ -97,6 +105,11 @@ el-sabor-colombiano/
 │   │   ├── sounds/
 │   │   │   ├── new-order.mp3
 │   │   │   └── order-ready.mp3
+│   │   ├── index.html (Landing page)
+│   │   ├── registro.html (Registration form)
+│   │   ├── login.html (Login form)
+│   │   ├── mesero.html (Waiter dashboard)
+│   │   ├── admin.html (Admin dashboard)
 │   │   └── logo.svg
 │   ├── src/
 │   │   ├── components/
@@ -248,18 +261,26 @@ npm run preview
 
 ### Productos
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | `/api/productos` | Lista todos los productos con stock y promociones |
-| PUT | `/api/productos/:id` | Actualiza un producto (nombre, descripción, precio, stock, promoción) |
+| Método | Endpoint | Descripción | Autenticación |
+|--------|----------|-------------|---------------|
+| GET | `/api/productos` | Lista todos los productos con stock y promociones | No |
+| POST | `/api/productos` | Crea un nuevo producto | Admin |
+| PUT | `/api/productos/:id` | Actualiza un producto (nombre, descripción, precio, stock, promoción) | Admin |
+| DELETE | `/api/productos/:id` | Elimina un producto | Admin |
 
 ### Pedidos
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| POST | `/api/pedidos` | Crea un nuevo pedido |
-| GET | `/api/pedidos` | Lista pedidos (opcional: `?estado=pendiente`) |
-| PUT | `/api/pedidos/:id/estado` | Actualiza el estado de un pedido |
+| Método | Endpoint | Descripción | Autenticación |
+|--------|----------|-------------|---------------|
+| POST | `/api/pedidos` | Crea un nuevo pedido | No |
+| GET | `/api/pedidos` | Lista pedidos (opcional: `?estado=pendiente`) | JWT |
+| PUT | `/api/pedidos/:id/estado` | Actualiza el estado de un pedido | JWT |
+
+### Ventas
+
+| Método | Endpoint | Descripción | Autenticación |
+|--------|----------|-------------|---------------|
+| GET | `/api/ventas/diarias` | Obtiene reporte de ventas diarias con productos vendidos e ingresos | Admin |
 
 ### Usuarios
 
@@ -371,6 +392,60 @@ POST /api/usuarios
 - **Mesero:** mesero@elsaborcolombiano.com / mesero123
 
 > ⚠️ **Importante:** Cambiar estas contraseñas en producción.
+
+## 🌐 Páginas HTML Estáticas
+
+El sistema incluye páginas HTML estáticas en `frontend/public/` para diferentes roles y funciones:
+
+### 📄 Páginas Disponibles
+
+#### `index.html` - Página de Inicio
+- Página de bienvenida del sistema
+- Enlaces a registro e inicio de sesión
+- Diseño atractivo con gradientes y animaciones
+
+#### `registro.html` - Formulario de Registro
+- Registro de nuevos usuarios
+- Campos: nombre, correo, contraseña, rol (mesero/admin)
+- Validación en tiempo real
+- Integración con API `/api/usuarios/register`
+
+#### `login.html` - Inicio de Sesión
+- Autenticación de usuarios
+- Redirección automática según rol:
+  - Meseros → `mesero.html`
+  - Administradores → `admin.html`
+- Almacenamiento seguro de JWT en localStorage
+- Integración con API `/api/usuarios/login`
+
+#### `mesero.html` - Panel del Mesero
+- Vista de pedidos activos en tiempo real
+- Estadísticas: total de pedidos, pendientes, listos
+- Filtrado automático de pedidos entregados
+- Actualización automática cada 30 segundos
+- Requiere autenticación con rol `mesero`
+
+#### `admin.html` - Panel del Administrador
+- Reporte de ventas diarias
+- Resumen de ingresos y pedidos completados
+- Tabla detallada de productos vendidos por categoría
+- Actualización automática cada 60 segundos
+- Requiere autenticación con rol `admin`
+
+### 🔐 Seguridad y Autenticación
+
+Todas las páginas que requieren autenticación verifican:
+1. Presencia del token JWT en localStorage
+2. Rol del usuario (mesero o admin)
+3. Redirección automática a `/login.html` si no está autenticado
+
+### 🌍 Configuración de URLs
+
+Las páginas detectan automáticamente el entorno:
+- **Desarrollo (localhost):** `http://localhost:4000/api`
+- **Producción:** `https://discerning-comfort-production.up.railway.app/api`
+
+Para cambiar la URL de producción, editar la constante `API_URL` en cada archivo HTML.
 
 ## 🔌 Eventos Socket.IO
 
