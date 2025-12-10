@@ -38,9 +38,21 @@ export const api = {
 
   // Products
   async getProducts() {
-    const response = await fetch(`${API_URL}/productos`);
-    if (!response.ok) throw new Error('Error al obtener productos');
-    return response.json();
+    try {
+      console.log('[API] Fetching products from:', `${API_URL}/productos`);
+      const response = await fetch(`${API_URL}/productos`);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('[API] Error response:', response.status, errorData);
+        throw new Error(errorData.error || 'Error al obtener productos');
+      }
+      const data = await response.json();
+      console.log('[API] Received products:', data.length);
+      return data;
+    } catch (error) {
+      console.error('[API] Failed to fetch products:', error);
+      throw error;
+    }
   },
 
   async updateProduct(id, data) {

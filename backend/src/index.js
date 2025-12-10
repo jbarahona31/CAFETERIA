@@ -52,14 +52,25 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'El Sabor Colombiano API is running' });
 });
 
-// Test DB connection
+// Test DB connection and show stats
 app.get('/api/test-db', async (req, res) => {
   try {
-    const result = await pool.query('SELECT NOW()');
-    res.json({ time: result.rows[0] });
+    const timeResult = await pool.query('SELECT NOW()');
+    const productsResult = await pool.query('SELECT COUNT(*) FROM productos');
+    const usersResult = await pool.query('SELECT COUNT(*) FROM usuarios');
+    const ordersResult = await pool.query('SELECT COUNT(*) FROM pedidos');
+    
+    res.json({ 
+      time: timeResult.rows[0],
+      stats: {
+        products: parseInt(productsResult.rows[0].count),
+        users: parseInt(usersResult.rows[0].count),
+        orders: parseInt(ordersResult.rows[0].count)
+      }
+    });
   } catch (err) {
     console.error('[DB Error]', err);
-    res.status(500).json({ error: 'Error conectando a la base de datos' });
+    res.status(500).json({ error: 'Error conectando a la base de datos', details: err.message });
   }
 });
 
