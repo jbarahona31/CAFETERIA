@@ -470,6 +470,8 @@ npm run seed
 
 Este proyecto está configurado para desplegarse automáticamente en Railway con el frontend y backend juntos.
 
+🚀 **Inicio Rápido**: Ver [RAILWAY_QUICK_START.md](./RAILWAY_QUICK_START.md) para desplegar en 5 minutos
+
 #### 1. Crear cuenta y proyecto en Railway
 
 1. Ve a [Railway.app](https://railway.app) y crea una cuenta
@@ -478,8 +480,11 @@ Este proyecto está configurado para desplegarse automáticamente en Railway con
 
 #### 2. Agregar base de datos PostgreSQL
 
-1. En tu proyecto de Railway, haz clic en "New" → "Database" → "PostgreSQL"
+1. En tu proyecto de Railway, haz clic en "New" → "Database" → "Add PostgreSQL"
 2. Railway creará automáticamente las variables de conexión
+3. La base de datos se inicializará automáticamente en el primer despliegue
+
+📖 **Documentación completa**: Ver [RAILWAY_DATABASE_SETUP.md](./RAILWAY_DATABASE_SETUP.md)
 
 #### 3. Configurar variables de entorno
 
@@ -510,7 +515,13 @@ Railway desplegará automáticamente cada vez que hagas `git push` a tu reposito
 El proyecto está configurado con `railway.json` para:
 - Instalar dependencias del proyecto completo
 - Compilar el frontend con `npm run build`
+- **Inicializar la base de datos automáticamente** (esquema + datos iniciales)
 - Servir el frontend estático desde el backend en producción
+
+✨ **Nota**: En el primer despliegue, el script creará automáticamente:
+- Todas las tablas necesarias (productos, pedidos, usuarios, etc.)
+- 14 productos iniciales
+- 2 usuarios por defecto (admin y mesero)
 
 #### URLs de producción
 

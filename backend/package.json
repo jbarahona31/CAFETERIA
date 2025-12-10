@@ -8,6 +8,8 @@
     "dev": "nodemon src/index.js",
     "seed": "node src/scripts/seed.js",
     "check-seed": "node src/scripts/check-and-seed.js",
+    "init-db": "node src/scripts/init-railway-db.js",
+    "verify-db": "node src/scripts/verify-db-config.js",
     "test-db": "node test-db.js"
   },
   "keywords": [

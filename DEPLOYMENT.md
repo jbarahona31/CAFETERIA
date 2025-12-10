@@ -1,11 +1,19 @@
 # Guía de Despliegue en Railway
 
+> 🚀 **¿Primera vez?** Ver [RAILWAY_QUICK_START.md](./RAILWAY_QUICK_START.md) para una guía rápida de 5 minutos
+
 ## Pasos para Desplegar en Railway
 
 ### 1. Configurar PostgreSQL en Railway
 
-1. En tu proyecto de Railway, agrega una nueva base de datos PostgreSQL
-2. Railway creará automáticamente la variable `DATABASE_URL`
+1. En tu proyecto de Railway, agrega una nueva base de datos PostgreSQL desde el catálogo
+   - Selecciona "New" → "Database" → "Add PostgreSQL"
+2. Railway creará automáticamente las siguientes variables:
+   - `DATABASE_URL` (URL completa de conexión)
+   - `POSTGRES_PASSWORD` (contraseña generada)
+   - Y otras variables de conexión
+
+📖 **Ver guía detallada**: [RAILWAY_DATABASE_SETUP.md](./RAILWAY_DATABASE_SETUP.md)
 
 ### 2. Configurar Variables de Entorno
 
@@ -26,9 +34,21 @@ Railway detectará automáticamente el `railway.json` y ejecutará:
 - `npm run build` (construye el frontend)
 - `npm run start` (inicia el servidor backend que sirve el frontend)
 
-### 4. Poblar la Base de Datos (Seed)
+### 4. Poblar la Base de Datos (Automático)
 
-Después del primer despliegue, necesitas poblar la base de datos con productos y usuarios iniciales.
+✨ **NUEVO**: La base de datos se inicializa automáticamente en el primer despliegue.
+
+El script de inicialización (`init-railway-db.js`) se ejecuta automáticamente y:
+- Crea todas las tablas necesarias
+- Inserta 14 productos iniciales (si la tabla está vacía)
+- Crea 2 usuarios por defecto (si la tabla está vacía)
+- Muestra un resumen en los logs
+
+**Para verificar que funcionó:**
+1. Ve a Railway → Tu servicio → Deployments → View Logs
+2. Busca mensajes como: "✅ Base de datos inicializada correctamente"
+
+**Inicialización manual** (solo si es necesario):
 
 #### Opción A: Usar Railway CLI
 
