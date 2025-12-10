@@ -65,7 +65,7 @@ async function checkAndSeed() {
       for (const user of seedUsers) {
         const contrasena_hash = await bcrypt.hash(user.contrasena, SALT_ROUNDS);
         await client.query(
-          `INSERT INTO usuarios (nombre, email, contrasena_hash, rol) 
+          `INSERT INTO usuarios (nombre, correo, contraseña, rol) 
            VALUES ($1, $2, $3, $4)`,
           [user.nombre, user.email, contrasena_hash, user.rol]
         );
