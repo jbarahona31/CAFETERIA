@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
     "build": "npm run build --prefix frontend",
+    "build:railway": "BUILD_TARGET=railway-fullstack npm run build --prefix frontend",
+    "build:netlify": "npm run build --prefix frontend",
     "start": "npm run start --prefix backend",
     "seed": "npm run check-seed --prefix backend",
     "deploy": "npm run init-db --prefix backend && npm run start --prefix backend",
