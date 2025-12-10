@@ -29,10 +29,10 @@ PORT=4000
 ### 3. Desplegar la Aplicación
 
 Railway detectará automáticamente el `railway.json` y ejecutará:
-- `npm install` (instala dependencias del backend)
-- `npm install --prefix frontend` (instala dependencias del frontend)
-- `npm run build` (construye el frontend)
-- `npm run start` (inicia el servidor backend que sirve el frontend)
+- **Build**: `npm install && npm install --prefix backend && npm install --prefix frontend && npm run build`
+- **Deploy**: `npm run deploy --prefix backend`
+  - Inicializa la base de datos (crea tablas e inserta datos iniciales)
+  - Inicia el servidor backend que sirve el frontend
 
 ### 4. Poblar la Base de Datos (Automático)
 
