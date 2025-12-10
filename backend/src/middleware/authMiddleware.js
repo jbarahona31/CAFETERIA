@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-key-change-in-production';
 
 // Fail fast if JWT_SECRET is not set in production
-if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
   throw new Error('JWT_SECRET environment variable is required in production');
 }
 

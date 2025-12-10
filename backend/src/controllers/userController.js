@@ -53,12 +53,12 @@ exports.login = async (req, res) => {
 
     const token = jwt.sign(
       { id: user.id, rol: user.rol },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || 'default-secret-key-change-in-production',
       { expiresIn: '1h' }
     );
 
     // Don't send password hash back to client
-    const { contraseña, ...userWithoutPassword } = user;
+    const { contraseña: password, ...userWithoutPassword } = user;
     res.json({ token, user: userWithoutPassword });
   } catch (err) {
     console.error('[DB Error]', err);
