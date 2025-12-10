@@ -3,6 +3,9 @@ const bcrypt = require('bcrypt');
 
 const SALT_ROUNDS = 10;
 
+// ⚠️ SECURITY WARNING: These are default passwords for initial setup only.
+// These credentials MUST be changed immediately after first deployment.
+// For production: Create users via the API with secure passwords.
 const seedProducts = [
   { nombre: 'Papas rellenas', categoria: 'comida', descripcion: 'Crujientes y doradas, con relleno casero', precio: 4500, stock: 20, promocion: false, imagen_url: '/img/papas.jpg' },
   { nombre: 'Empanada de pollo', categoria: 'comida', descripcion: 'Pollo desmechado con especias', precio: 2000, stock: 50, promocion: true, imagen_url: '/img/emp_pollo.jpg' },
@@ -68,8 +71,9 @@ async function checkAndSeed() {
         );
       }
       console.log(`✅ ${seedUsers.length} usuarios insertados`);
-      console.log('  - Admin: admin@elsaborcolombiano.com / admin123');
-      console.log('  - Mesero: mesero@elsaborcolombiano.com / mesero123');
+      console.log('⚠️  IMPORTANTE: Usuarios creados con contraseñas por defecto.');
+      console.log('   Consulta el archivo src/scripts/check-and-seed.js para ver las credenciales.');
+      console.log('   CAMBIA estas contraseñas inmediatamente en producción.');
     } else {
       console.log('✅ La tabla de usuarios ya tiene datos');
     }
