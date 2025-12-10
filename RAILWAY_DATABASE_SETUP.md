@@ -158,7 +158,12 @@ npm run init-db
 | admin@elsaborcolombiano.com | admin123 | admin |
 | mesero@elsaborcolombiano.com | mesero123 | mesero |
 
-⚠️ **IMPORTANTE**: Estas son credenciales por defecto. Debes cambiarlas inmediatamente después del primer despliegue usando el endpoint `/api/usuarios/:id` con autenticación de administrador.
+⚠️ **SEGURIDAD CRÍTICA**: 
+- Estas son credenciales por defecto con contraseñas débiles
+- **DEBEN cambiarse INMEDIATAMENTE** después del primer despliegue
+- Usa el endpoint `/api/usuarios/:id` con autenticación de administrador
+- Las contraseñas deben tener mínimo 12 caracteres con letras, números y símbolos
+- Considera implementar cambio de contraseña obligatorio en el primer inicio de sesión
 
 ## Conexión desde tu PC
 

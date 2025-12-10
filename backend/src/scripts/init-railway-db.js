@@ -76,6 +76,10 @@ const seedProducts = [
   { nombre: 'Chocolate', categoria: 'bebida', descripcion: 'Espeso y caliente', precio: 3000, stock: 40, promocion: false, imagen_url: '/img/chocolate.jpg' }
 ];
 
+// ⚠️ SECURITY WARNING: Default passwords for initial setup ONLY
+// These credentials are intentionally simple for first-time setup and MUST be changed
+// immediately after deployment. For production, use the API to update passwords with
+// strong, unique values. Consider implementing forced password change on first login.
 const seedUsers = [
   { nombre: 'Administrador', email: 'admin@elsaborcolombiano.com', contrasena: 'admin123', rol: 'admin' },
   { nombre: 'Mesero Principal', email: 'mesero@elsaborcolombiano.com', contrasena: 'mesero123', rol: 'mesero' }
@@ -131,9 +135,16 @@ async function initializeDatabase() {
       }
       console.log(`✅ ${seedUsers.length} usuarios insertados`);
       console.log('');
-      console.log('⚠️  CREDENCIALES INICIALES (CAMBIAR EN PRODUCCIÓN):');
+      console.log('⚠️  ============================================');
+      console.log('⚠️  CREDENCIALES INICIALES (CAMBIAR INMEDIATAMENTE):');
       console.log('   👤 Admin: admin@elsaborcolombiano.com / admin123');
       console.log('   👤 Mesero: mesero@elsaborcolombiano.com / mesero123');
+      console.log('');
+      console.log('🔒 ACCIÓN REQUERIDA:');
+      console.log('   1. Inicia sesión con estas credenciales');
+      console.log('   2. Cambia las contraseñas usando el endpoint /api/usuarios/:id');
+      console.log('   3. Usa contraseñas fuertes (mínimo 12 caracteres, letras, números, símbolos)');
+      console.log('⚠️  ============================================');
       console.log('');
     } else {
       console.log('ℹ️  Los usuarios ya existen, omitiendo seed');

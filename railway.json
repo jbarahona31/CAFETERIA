@@ -6,7 +6,7 @@
   },
   "deploy": {
     "numReplicas": 1,
-    "startCommand": "cd backend && npm run init-db && cd .. && npm run start",
+    "startCommand": "npm run deploy",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }

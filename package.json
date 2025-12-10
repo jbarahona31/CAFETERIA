@@ -8,6 +8,7 @@
     "build": "npm run build --prefix frontend",
     "start": "npm run start --prefix backend",
     "seed": "npm run check-seed --prefix backend",
+    "deploy": "npm run init-db --prefix backend && npm run start --prefix backend",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
