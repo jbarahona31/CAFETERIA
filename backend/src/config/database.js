@@ -12,7 +12,11 @@ if (process.env.DATABASE_URL) {
     },
   });
 } else {
-  // 🖥️ Configuración detallada para desarrollo local
+  // 🖥️ Configuración detallada para desarrollo local o Railway con variables individuales
+  const sslConfig = process.env.NODE_ENV === 'production' || process.env.DB_SSL === 'true' 
+    ? { rejectUnauthorized: false } 
+    : false;
+  
   pool = new Pool({
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'postgres',
@@ -20,7 +24,7 @@ if (process.env.DATABASE_URL) {
     database: process.env.DB_NAME || 'el_sabor_colombiano',
     port: parseInt(process.env.DB_PORT || '5432', 10),
     max: 10,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    ssl: sslConfig,
   });
 }
 
