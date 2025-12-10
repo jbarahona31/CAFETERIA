@@ -2,10 +2,17 @@
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/YOUR-SITE-ID/deploy-status)](https://app.netlify.com/sites/YOUR-SITE-NAME/deploys)
 
 > El auténtico sabor de nuestra tierra 🇨🇴
 
 Sistema completo de menú digital para cafetería con gestión de pedidos en tiempo real, desarrollado con Node.js, Express, Socket.IO, React y PostgreSQL.
+
+## 🚀 Deploy Rápido en Netlify
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/jbarahona31/CAFETERIA)
+
+📖 **[Documentación completa de Netlify](./NETLIFY_INDEX.md)** | ⚡ **[Quick Start (5 min)](./NETLIFY_QUICK_START.md)**
 
 ## 📋 Tabla de Contenidos
 
@@ -466,9 +473,17 @@ npm run seed
 
 ## 🚀 Despliegue
 
-### Despliegue en Railway (Recomendado)
+### Despliegue en Netlify + Railway (Recomendado)
 
-Este proyecto está configurado para desplegarse automáticamente en Railway con el frontend y backend juntos.
+Este proyecto utiliza una arquitectura dividida para el despliegue:
+- **Frontend en Netlify**: Rápido, CDN global, deploy automático
+- **Backend en Railway**: Soporta WebSockets/Socket.IO para notificaciones en tiempo real
+
+🌐 **Despliegue en Netlify**: Ver [NETLIFY_DEPLOYMENT.md](./NETLIFY_DEPLOYMENT.md) para la guía completa
+
+### Despliegue en Railway (Fullstack)
+
+También puedes desplegar frontend y backend juntos en Railway.
 
 🚀 **Inicio Rápido**: Ver [RAILWAY_QUICK_START.md](./RAILWAY_QUICK_START.md) para desplegar en 5 minutos
 
@@ -531,9 +546,29 @@ Reemplaza `<tu-proyecto>` con el nombre de tu proyecto en Railway:
 - **Frontend:** `https://<tu-proyecto>.up.railway.app`
 - **Socket.IO:** `https://<tu-proyecto>.up.railway.app`
 
-### Despliegue Alternativo
+### Opciones de Despliegue Alternativas
 
-#### Backend (Render, VPS)
+#### Opción 1: Netlify (Frontend) + Railway (Backend)
+- **Frontend**: Deploy automático en Netlify con CDN global
+- **Backend**: Railway con PostgreSQL y Socket.IO
+- Ver [NETLIFY_DEPLOYMENT.md](./NETLIFY_DEPLOYMENT.md)
+
+#### Opción 2: Railway (Fullstack)
+- Frontend y backend juntos en Railway
+- Ver [RAILWAY_QUICK_START.md](./RAILWAY_QUICK_START.md)
+
+#### Opción 3: Netlify + Render
+- **Frontend**: Netlify
+- **Backend**: Render (alternativa a Railway)
+- Render soporta WebSockets y tiene plan gratuito
+
+#### Opción 4: Vercel + Railway
+- **Frontend**: Vercel (similar a Netlify)
+- **Backend**: Railway
+
+### Componentes Individuales
+
+#### Backend (Render, VPS, DigitalOcean)
 
 ```bash
 # Con PM2
@@ -541,11 +576,12 @@ npm install -g pm2
 pm2 start src/index.js --name "el-sabor-api"
 ```
 
-#### Frontend (Vercel, Netlify)
+#### Frontend (Netlify, Vercel, CloudFlare Pages)
 
 ```bash
+cd frontend
 npm run build
-# Subir carpeta dist/ al hosting
+# La carpeta dist/ contiene los archivos estáticos
 ```
 
 ### Base de datos (Supabase, Railway, Neon, RDS)

@@ -16,10 +16,15 @@ const userRoutes = require('./routes/userRoutes');
 const app = express();
 const server = http.createServer(app);
 
+// Configure allowed origins for CORS
+const allowedOrigins = process.env.FRONTEND_URL 
+  ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
+  : ['*'];
+
 // Socket.IO setup
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || '*',
+    origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
 });
@@ -32,7 +37,10 @@ app.set('io', io);
 app.set('trust proxy', 1);
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 app.use(express.json());
 
 // Serve static files from frontend dist folder in production
