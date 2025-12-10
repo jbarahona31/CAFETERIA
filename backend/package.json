@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
+    "deploy": "npm run init-db && npm start",
     "seed": "node src/scripts/seed.js",
     "check-seed": "node src/scripts/check-and-seed.js",
     "init-db": "node src/scripts/init-railway-db.js",

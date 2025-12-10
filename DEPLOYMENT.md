@@ -30,7 +30,7 @@ PORT=4000
 
 Railway detectará automáticamente el `railway.json` y ejecutará:
 - **Build**: `npm install && npm install --prefix backend && npm install --prefix frontend && npm run build`
-- **Deploy**: `cd backend && npm run init-db && npm start`
+- **Deploy**: `npm run deploy --prefix backend`
   - Inicializa la base de datos (crea tablas e inserta datos iniciales)
   - Inicia el servidor backend que sirve el frontend
 
