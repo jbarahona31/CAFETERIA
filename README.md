@@ -2,10 +2,17 @@
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/YOUR-SITE-ID/deploy-status)](https://app.netlify.com/sites/YOUR-SITE-NAME/deploys)
 
 > El auténtico sabor de nuestra tierra 🇨🇴
 
 Sistema completo de menú digital para cafetería con gestión de pedidos en tiempo real, desarrollado con Node.js, Express, Socket.IO, React y PostgreSQL.
+
+## 🚀 Deploy Rápido en Netlify
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/jbarahona31/CAFETERIA)
+
+📖 **[Documentación completa de Netlify](./NETLIFY_INDEX.md)** | ⚡ **[Quick Start (5 min)](./NETLIFY_QUICK_START.md)**
 
 ## 📋 Tabla de Contenidos
 
