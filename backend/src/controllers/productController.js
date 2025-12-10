@@ -3,11 +3,13 @@ const pool = require('../config/database');
 // Obtener todos los productos
 exports.getAll = async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM productos');
+    console.log('[ProductController] Fetching all products...');
+    const result = await pool.query('SELECT * FROM productos ORDER BY categoria, nombre');
+    console.log(`[ProductController] Found ${result.rows.length} products`);
     res.json(result.rows);
   } catch (err) {
-    console.error('[DB Error]', err);
-    res.status(500).json({ error: 'Error obteniendo productos' });
+    console.error('[ProductController] Error fetching products:', err);
+    res.status(500).json({ error: 'Error obteniendo productos', details: err.message });
   }
 };
 

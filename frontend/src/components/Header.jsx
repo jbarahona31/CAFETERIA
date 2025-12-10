@@ -19,7 +19,7 @@ function Header() {
     <header className="header">
       <div className="container header-content">
         <Link to="/" className="logo">
-          <img src="/logo.svg" alt="El Sabor Colombiano Logo" className="logo-img" />
+          <img src="/img/LOGO.jpeg" alt="El Sabor Colombiano Logo" className="logo-img" />
           <div className="logo-text">
             <h1>El Sabor Colombiano</h1>
             <span className="tagline">El auténtico sabor de nuestra tierra</span>
