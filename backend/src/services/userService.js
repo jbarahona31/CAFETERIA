@@ -15,7 +15,7 @@ class UserService {
   // Obtener todos los usuarios
   async getAll() {
     const result = await pool.query(
-      'SELECT id, nombre, email, rol, created_at FROM usuarios ORDER BY created_at DESC'
+      'SELECT id, nombre, correo, rol, created_at FROM usuarios ORDER BY created_at DESC'
     );
     return result.rows;
   }
@@ -23,7 +23,7 @@ class UserService {
   // Obtener usuario por ID
   async getById(id) {
     const result = await pool.query(
-      'SELECT id, nombre, email, rol, created_at FROM usuarios WHERE id = $1',
+      'SELECT id, nombre, correo, rol, created_at FROM usuarios WHERE id = $1',
       [id]
     );
     return result.rows[0] || null;
@@ -32,7 +32,7 @@ class UserService {
   // Obtener usuario por email
   async getByEmail(email) {
     const result = await pool.query(
-      'SELECT id, nombre, email, contrasena_hash, rol, created_at FROM usuarios WHERE email = $1',
+      'SELECT id, nombre, correo, contraseña, rol, created_at FROM usuarios WHERE correo = $1',
       [email]
     );
     return result.rows[0] || null;
@@ -54,9 +54,9 @@ class UserService {
     const contrasena_hash = await bcrypt.hash(contrasena, SALT_ROUNDS);
 
     const result = await pool.query(
-      `INSERT INTO usuarios (nombre, email, contrasena_hash, rol) 
+      `INSERT INTO usuarios (nombre, correo, contraseña, rol) 
        VALUES ($1, $2, $3, $4) 
-       RETURNING id, nombre, email, rol, created_at`,
+       RETURNING id, nombre, correo, rol, created_at`,
       [nombre, email, contrasena_hash, rol]
     );
 
@@ -83,12 +83,12 @@ class UserService {
         error.code = 'EMAIL_IN_USE';
         throw error;
       }
-      fields.push(`email = $${paramIndex++}`);
+      fields.push(`correo = $${paramIndex++}`);
       values.push(email);
     }
     if (contrasena !== undefined) {
       const contrasena_hash = await bcrypt.hash(contrasena, SALT_ROUNDS);
-      fields.push(`contrasena_hash = $${paramIndex++}`);
+      fields.push(`contraseña = $${paramIndex++}`);
       values.push(contrasena_hash);
     }
     if (rol !== undefined) {
@@ -127,13 +127,13 @@ class UserService {
       return null;
     }
 
-    const isValid = await bcrypt.compare(contrasena, user.contrasena_hash);
+    const isValid = await bcrypt.compare(contrasena, user.contraseña);
     if (!isValid) {
       return null;
     }
 
     // Excluir hash de la respuesta
-    const { contrasena_hash, ...userWithoutPassword } = user;
+    const { contraseña, ...userWithoutPassword } = user;
     
     // Generar token JWT
     const token = jwt.sign(
