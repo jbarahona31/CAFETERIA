@@ -5,18 +5,21 @@ const jwt = require('jsonwebtoken');
 // Registrar usuario
 exports.register = async (req, res) => {
   try {
-    const { nombre, correo, contraseña, rol } = req.body;
+    const { nombre, email, contrasena, rol } = req.body;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(contrasena, 10);
 
     const result = await pool.query(
-      'INSERT INTO usuarios (nombre, email, password, rol) VALUES ($1, $2, $3, $4) RETURNING *',
+      'INSERT INTO usuarios (nombre, email, contrasena_hash, rol) VALUES ($1, $2, $3, $4) RETURNING id, nombre, email, rol, created_at',
       [nombre, email, hashedPassword, rol || 'cliente']
     );
 
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error('[DB Error]', err);
+    if (err.code === '23505') { // Unique violation
+      return res.status(409).json({ error: 'El email ya está registrado' });
+    }
     res.status(500).json({ error: 'Error registrando usuario' });
   }
 };
@@ -24,16 +27,16 @@ exports.register = async (req, res) => {
 // Login usuario
 exports.login = async (req, res) => {
   try {
-    const { correo, contraseña } = req.body;
+    const { email, contrasena } = req.body;
 
-    const result = await pool.query('SELECT * FROM usuarios WHERE correo = $1', [correo]);
+    const result = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
     const user = result.rows[0];
 
     if (!user) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    const validPassword = await bcrypt.compare(contraseña, user.contraseña);
+    const validPassword = await bcrypt.compare(contrasena, user.contrasena_hash);
     if (!validPassword) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
@@ -44,7 +47,9 @@ exports.login = async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    res.json({ token, user });
+    // Don't send password hash back to client
+    const { contrasena_hash, ...userWithoutPassword } = user;
+    res.json({ token, user: userWithoutPassword });
   } catch (err) {
     console.error('[DB Error]', err);
     res.status(500).json({ error: 'Error en login' });
@@ -54,7 +59,7 @@ exports.login = async (req, res) => {
 // Obtener todos los usuarios
 exports.getAll = async (req, res) => {
   try {
-    const result = await pool.query('SELECT id, nombre, correo, rol FROM usuarios');
+    const result = await pool.query('SELECT id, nombre, email, rol, created_at FROM usuarios');
     res.json(result.rows);
   } catch (err) {
     console.error('[DB Error]', err);
@@ -66,7 +71,7 @@ exports.getAll = async (req, res) => {
 exports.getById = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await pool.query('SELECT id, nombre, correo, rol FROM usuarios WHERE id = $1', [id]);
+    const result = await pool.query('SELECT id, nombre, email, rol, created_at FROM usuarios WHERE id = $1', [id]);
 
     if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -82,17 +87,20 @@ exports.getById = async (req, res) => {
 // Crear usuario (admin)
 exports.create = async (req, res) => {
   try {
-    const { nombre, email, password, rol } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const { nombre, email, contrasena, rol } = req.body;
+    const hashedPassword = await bcrypt.hash(contrasena, 10);
 
     const result = await pool.query(
-      'INSERT INTO usuarios (nombre, correo, contraseña, rol) VALUES ($1, $2, $3, $4) RETURNING *',
-      [nombre, correo, hashedPassword, rol || 'cliente']
+      'INSERT INTO usuarios (nombre, email, contrasena_hash, rol) VALUES ($1, $2, $3, $4) RETURNING id, nombre, email, rol, created_at',
+      [nombre, email, hashedPassword, rol || 'cliente']
     );
 
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error('[DB Error]', err);
+    if (err.code === '23505') { // Unique violation
+      return res.status(409).json({ error: 'El email ya está registrado' });
+    }
     res.status(500).json({ error: 'Error creando usuario' });
   }
 };
@@ -101,18 +109,18 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, correo, contraseña, rol } = req.body;
+    const { nombre, email, contrasena, rol } = req.body;
 
     let hashedPassword = null;
-    if (contraseña) {
-      hashedPassword = await bcrypt.hash(contraseña, 10);
+    if (contrasena) {
+      hashedPassword = await bcrypt.hash(contrasena, 10);
     }
 
     const result = await pool.query(
       `UPDATE usuarios 
-       SET nombre = $1, correo = $2, contraseña = COALESCE($3, contraseña), rol = $4 
-       WHERE id = $5 RETURNING *`,
-      [nombre, correo, hashedPassword, rol, id]
+       SET nombre = $1, email = $2, contrasena_hash = COALESCE($3, contrasena_hash), rol = $4 
+       WHERE id = $5 RETURNING id, nombre, email, rol, created_at`,
+      [nombre, email, hashedPassword, rol, id]
     );
 
     if (result.rowCount === 0) {
@@ -122,6 +130,9 @@ exports.update = async (req, res) => {
     res.json(result.rows[0]);
   } catch (err) {
     console.error('[DB Error]', err);
+    if (err.code === '23505') { // Unique violation
+      return res.status(409).json({ error: 'El email ya está registrado' });
+    }
     res.status(500).json({ error: 'Error actualizando usuario' });
   }
 };
