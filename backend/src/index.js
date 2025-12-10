@@ -12,6 +12,7 @@ const pool = require('./config/database');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const userRoutes = require('./routes/userRoutes');
+const salesRoutes = require('./routes/salesRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -58,6 +59,7 @@ app.use((req, res, next) => {
 app.use('/api/productos', productRoutes);
 app.use('/api/pedidos', orderRoutes);
 app.use('/api/usuarios', userRoutes);
+app.use('/api/ventas', salesRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
