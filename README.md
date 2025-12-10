@@ -582,12 +582,17 @@ Este repositorio está configurado para desplegar **solo el backend** en Railway
 En la configuración del servicio en Railway, agrega las siguientes variables:
 
 ```env
-# Base de datos PostgreSQL (Railway las proporciona automáticamente al agregar PostgreSQL)
-PGHOST=containers.railway.app
-PGDATABASE=railway
-PGPASSWORD=<tu_password_de_railway>
-PGPORT=5432
-PGUSER=postgres
+# Base de datos PostgreSQL (Railway proporciona DATABASE_URL automáticamente)
+# Opción 1: Usar DATABASE_URL (recomendado)
+DATABASE_URL=postgresql://user:password@host:port/database
+
+# Opción 2: Variables individuales (alternativa)
+DB_HOST=containers-us-west-XXX.railway.app
+DB_NAME=railway
+DB_PASSWORD=<tu_password_de_railway>
+DB_PORT=5432
+DB_USER=postgres
+DB_SSL=true
 
 # Configuración del servidor
 NODE_ENV=production
