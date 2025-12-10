@@ -556,9 +556,9 @@ Este proyecto utiliza una arquitectura dividida para el despliegue:
 
 🌐 **Despliegue en Netlify**: Ver [NETLIFY_DEPLOYMENT.md](./NETLIFY_DEPLOYMENT.md) para la guía completa
 
-### Despliegue en Railway (Fullstack)
+### Despliegue del Backend en Railway
 
-También puedes desplegar frontend y backend juntos en Railway.
+Este repositorio está configurado para desplegar **solo el backend** en Railway usando Dockerfile.
 
 🚀 **Inicio Rápido**: Ver [RAILWAY_QUICK_START.md](./RAILWAY_QUICK_START.md) para desplegar en 5 minutos
 
@@ -566,7 +566,8 @@ También puedes desplegar frontend y backend juntos en Railway.
 
 1. Ve a [Railway.app](https://railway.app) y crea una cuenta
 2. Crea un nuevo proyecto desde tu repositorio de GitHub
-3. Railway detectará automáticamente la configuración del proyecto
+3. En **Settings → Builder**, selecciona **Dockerfile** (el archivo `railway.json` ya está configurado para usar el Dockerfile)
+4. Railway usará el `Dockerfile` en la raíz del repositorio que despliega solo el backend
 
 #### 2. Agregar base de datos PostgreSQL
 
@@ -581,45 +582,47 @@ También puedes desplegar frontend y backend juntos en Railway.
 En la configuración del servicio en Railway, agrega las siguientes variables:
 
 ```env
-# Base de datos (Railway las proporciona automáticamente al agregar PostgreSQL)
-DB_HOST=containers.railway.app
-DB_NAME=railway
-DB_PASSWORD=<tu_password_de_railway>
-DB_PORT=5432
-DB_USER=railway
+# Base de datos PostgreSQL (Railway las proporciona automáticamente al agregar PostgreSQL)
+PGHOST=containers.railway.app
+PGDATABASE=railway
+PGPASSWORD=<tu_password_de_railway>
+PGPORT=5432
+PGUSER=postgres
 
 # Configuración del servidor
 NODE_ENV=production
+PORT=4000
 
 # JWT (usa un valor seguro)
 JWT_SECRET=<tu_jwt_secret_seguro>
 
-# URL del frontend (para CORS) - Reemplaza con tu URL de Railway
-FRONTEND_URL=https://<tu-proyecto>.up.railway.app
+# URL del frontend (para CORS) - Reemplaza con tu URL de Netlify
+FRONTEND_URL=https://<tu-sitio>.netlify.app
 ```
 
-#### 4. Despliegue automático
+#### 4. Configuración del Builder
+
+El proyecto está configurado con `railway.json` para usar **Dockerfile** en lugar de Railpack/Nixpacks:
+- El `Dockerfile` en la raíz del repositorio despliega **solo el backend**
+- Instala las dependencias de producción del backend (`npm install --omit=dev`)
+- Inicia el servidor en el puerto 4000 con `npm start`
+- No incluye el frontend (debe desplegarse por separado en Netlify)
+
+✨ **Nota**: Si ves el error "⚠ Script start.sh no encontrado", verifica que:
+1. En Railway → Settings → Builder esté seleccionado **Dockerfile**
+2. El archivo `railway.json` tenga `"builder": "DOCKERFILE"`
+
+#### 5. Despliegue automático
 
 Railway desplegará automáticamente cada vez que hagas `git push` a tu repositorio.
-
-El proyecto está configurado con `railway.json` para:
-- Instalar dependencias del proyecto completo
-- Compilar el frontend con `npm run build`
-- **Inicializar la base de datos automáticamente** (esquema + datos iniciales)
-- Servir el frontend estático desde el backend en producción
-
-✨ **Nota**: En el primer despliegue, el script creará automáticamente:
-- Todas las tablas necesarias (productos, pedidos, usuarios, etc.)
-- 14 productos iniciales
-- 2 usuarios por defecto (admin y mesero)
 
 #### URLs de producción
 
 Reemplaza `<tu-proyecto>` con el nombre de tu proyecto en Railway:
 
-- **API:** `https://<tu-proyecto>.up.railway.app/api`
-- **Frontend:** `https://<tu-proyecto>.up.railway.app`
+- **Backend API:** `https://<tu-proyecto>.up.railway.app/api`
 - **Socket.IO:** `https://<tu-proyecto>.up.railway.app`
+- **Frontend:** Desplegado en Netlify (ver [NETLIFY_DEPLOYMENT.md](./NETLIFY_DEPLOYMENT.md))
 
 ### Opciones de Despliegue Alternativas
 
