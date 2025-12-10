@@ -81,7 +81,25 @@ Una vez desplegado, verifica que todo funcione:
    - Visita `https://tu-app.up.railway.app`
    - Deberías ver el menú con productos
 
+## Configuración de Producción
+
+### Trust Proxy
+
+La aplicación está configurada con `trust proxy` habilitado para funcionar correctamente detrás del proxy reverso de Railway. Esto permite que:
+
+- `express-rate-limit` identifique correctamente las IPs de los clientes a través del header `X-Forwarded-For`
+- Los límites de tasa (rate limiting) funcionen correctamente en login y registro
+- Se prevengan ataques de fuerza bruta efectivamente
+
+**Configuración**: `app.set('trust proxy', 1)` en `backend/src/index.js`
+
 ## Solución de Problemas
+
+### Error de Rate Limiting (X-Forwarded-For)
+
+Si ves el error `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR`:
+- Asegúrate de que `trust proxy` esté habilitado en Express (ya configurado)
+- Este error ocurre cuando Railway envía headers de proxy pero Express no está configurado para confiar en ellos
 
 ### Los productos no aparecen
 

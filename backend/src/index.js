@@ -27,6 +27,10 @@ const io = new Server(server, {
 // Store io in app for access in controllers
 app.set('io', io);
 
+// Trust proxy - Required for Railway and other reverse proxies
+// This allows express-rate-limit to correctly identify client IPs
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(cors());
 app.use(express.json());
