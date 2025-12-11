@@ -2,16 +2,12 @@
 FROM node:18
 
 # Directorio de trabajo dentro del contenedor
-WORKDIR /backend
+WORKDIR /app
 
-# Copiar archivos de configuración del backend
-COPY backend/package*.json ./
-
-# Instalar dependencias sin devDependencies
-RUN npm install --omit=dev
-
-# Copiar el resto del backend
-COPY backend ./
+# Copiar archivos del backend
+COPY backend/package*.json ./backend/
+RUN npm install --omit=dev --prefix backend
+COPY backend ./backend/
 
 # Variables de entorno
 ENV NODE_ENV=production
@@ -21,4 +17,4 @@ ENV PORT=4000
 EXPOSE 4000
 
 # Comando de inicio
-CMD ["npm", "start"]
+CMD ["npm", "start", "--prefix", "backend"]
