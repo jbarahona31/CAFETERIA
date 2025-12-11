@@ -54,7 +54,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { id: user.id, rol: user.rol },
       process.env.JWT_SECRET || 'default-secret-key-change-in-production',
-      { expiresIn: process.env.TOKEN_EXPIRATION || '24h' }
+      { expiresIn: process.env.TOKEN_EXPIRATION || '1d' }
     );
 
     // Don't send password hash back to client
