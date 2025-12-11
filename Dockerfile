@@ -1,33 +1,23 @@
-# Etapa de build
-FROM node:18 AS build
-WORKDIR /app
+# Imagen base
+FROM node:18
 
-# Copiamos todo el proyecto
-COPY . .
-
-# Instalamos dependencias del frontend incluyendo devDependencies (necesarias para Vite)
-WORKDIR /app/frontend
-RUN npm install
-
-# Compilamos el frontend
-RUN npm run build
-
-# Etapa de producción
-FROM node:18 AS production
+# Directorio de trabajo dentro del contenedor
 WORKDIR /app/backend
 
-# Copiamos solo lo necesario del backend
+# Copiar archivos de configuración del backend
 COPY backend/package*.json ./
+
+# Instalar dependencias sin devDependencies
 RUN npm install --omit=dev
 
+# Copiar el resto del backend
 COPY backend ./
-
 
 # Variables de entorno
 ENV NODE_ENV=production
 ENV PORT=4000
 
-# Exponemos el puerto
+# Exponer el puerto
 EXPOSE 4000
 
 # Comando de inicio
