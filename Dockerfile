@@ -2,7 +2,7 @@
 FROM node:18
 
 # Directorio de trabajo dentro del contenedor
-WORKDIR /app/backend
+WORKDIR /backend
 
 # Copiar archivos de configuración del backend
 COPY backend/package*.json ./
