@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
-const path = require('path');
 const { Server } = require('socket.io');
 
 // Importar conexión a la base de datos
@@ -34,7 +33,6 @@ const io = new Server(server, {
 app.set('io', io);
 
 // Trust proxy - Required for Railway and other reverse proxies
-// This allows express-rate-limit to correctly identify client IPs
 app.set('trust proxy', 1);
 
 // Middleware
@@ -43,11 +41,6 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
-
-// Serve static files from frontend dist folder in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../dist')));
-}
 
 // Request logging
 app.use((req, res, next) => {
@@ -92,18 +85,15 @@ app.get('/api/test-db', async (req, res) => {
 io.on('connection', (socket) => {
   console.log(`[Socket] Cliente conectado: ${socket.id}`);
 
-  // Meseros join their room
   socket.on('join_meseros', () => {
     socket.join('meseros');
     console.log(`[Socket] ${socket.id} se unió a la sala meseros`);
   });
 
-  // Listen for status change requests from meseros
   socket.on('cambiar_estado', async (data) => {
     const { pedidoId, estado } = data;
     console.log(`[Socket] Solicitud cambiar_estado: pedido ${pedidoId} -> ${estado}`);
     // Nota: Los cambios de estado deben hacerse vía REST API para consistencia
-    // Este evento es solo para actualizaciones en tiempo real
   });
 
   socket.on('disconnect', () => {
@@ -116,19 +106,6 @@ app.use((err, req, res, next) => {
   console.error('[Error]', err);
   res.status(500).json({ error: 'Error interno del servidor' });
 });
-
-// Catch-all route for SPA (must be after API routes)
-if (process.env.NODE_ENV === 'production') {
-  app.get('*', (req, res) => {
-    const indexPath = path.join(__dirname, '../dist/index.html');
-    res.sendFile(indexPath, (err) => {
-      if (err) {
-        console.error('[Error] Failed to serve index.html:', err);
-        res.status(500).send('Error loading application');
-      }
-    });
-  });
-}
 
 const PORT = process.env.PORT || 4000;
 
