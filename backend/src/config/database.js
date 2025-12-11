@@ -1,5 +1,10 @@
 const { Pool } = require("pg");
 
+// Validate required environment variables
+if (!process.env.DB_HOST || !process.env.DB_PORT || !process.env.DB_USER || !process.env.DB_PASSWORD || !process.env.DB_NAME) {
+  throw new Error('Missing required database environment variables (DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)');
+}
+
 const pool = new Pool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
