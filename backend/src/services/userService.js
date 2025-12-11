@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const SALT_ROUNDS = 10;
 const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_EXPIRES_IN = '24h';
+const JWT_EXPIRES_IN = process.env.TOKEN_EXPIRATION || '1d';
 
 // Fail fast si JWT_SECRET no está definido en producción
 if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
@@ -40,7 +40,7 @@ class UserService {
 
   // Crear usuario nuevo
   async create(data) {
-    const { nombre, email, contrasena, rol = 'mesero' } = data;
+    const { nombre, email, contrasena, rol = process.env.DEFAULT_ROLE || 'mesero' } = data;
 
     // Validar si el correo ya existe
     const existing = await this.getByEmail(email);
