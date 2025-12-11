@@ -1,40 +1,12 @@
-const { Pool } = require('pg');
-require('dotenv').config();
+const { Pool } = require("pg");
 
-let pool;
-
-if (process.env.DATABASE_URL) {
-  // 🚀 Simplificado para Railway (usa DATABASE_URL)
-  pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: false, // Railway requiere SSL
-    },
-  });
-} else {
-  // 🖥️ Configuración detallada para desarrollo local o Railway con variables individuales
-  const sslConfig = process.env.NODE_ENV === 'production' || process.env.DB_SSL === 'true' 
-    ? { rejectUnauthorized: false } 
-    : false;
-  
-  pool = new Pool({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'MmosgDOxUMLhdpAMauLdHiNbWxsljAPn',
-    database: process.env.DB_NAME || 'el_sabor_colombiano',
-    port: parseInt(process.env.DB_PORT || '5432', 10),
-    max: 10,
-    ssl: sslConfig,
-  });
-}
-
-// 🔎 Verificación de conexión
-pool.query('SELECT NOW()', (err, res) => {
-  if (err) {
-    console.error('❌ Error de conexión con PostgreSQL:', err.message);
-  } else {
-    console.log('✅ Conexión exitosa con PostgreSQL. Hora actual:', res.rows[0].now);
-  }
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
 });
 
 module.exports = pool;
