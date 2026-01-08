@@ -43,7 +43,7 @@ function ProductCardWith3DToggle({ product }) {
   };
 
   // Determinar si el producto tiene modelo 3D disponible
-  const has3DModel = product.model3d_url && product.model3d_url.length > 0;
+  const has3DModel = product.model3d_url?.length > 0;
 
   return (
     <article className="product-card card fade-in">
@@ -144,7 +144,7 @@ function ProductCardWith3DDefault({ product }) {
     }
   };
 
-  const has3DModel = product.model3d_url && product.model3d_url.length > 0;
+  const has3DModel = product.model3d_url?.length > 0;
 
   return (
     <article className="product-card card fade-in">
@@ -215,7 +215,7 @@ function ProductCardWith3DDefault({ product }) {
 
 // OPCIÓN 3: Componente simple solo para visualización 3D (sin funcionalidad de carrito)
 function Product3DViewer({ product }) {
-  const has3DModel = product.model3d_url && product.model3d_url.length > 0;
+  const has3DModel = product.model3d_url?.length > 0;
 
   return (
     <div className="product-3d-viewer">
