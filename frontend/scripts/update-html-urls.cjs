@@ -63,13 +63,12 @@ htmlFiles.forEach(file => {
     // Patrón para encontrar y reemplazar la configuración de API_URL
     const pattern = /const API_URL = window\.location\.hostname === 'localhost'\s*\?\s*'http:\/\/localhost:4000\/api'\s*:\s*'[^']+'/g;
     
-    const replacement = `const API_URL = window.location.hostname === 'localhost' 
-            ? 'http://localhost:4000/api'
-            : '${API_URL}'`;
+    const replacement = `const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:4000/api' : '${API_URL}'`;
     
-    if (pattern.test(content)) {
-      content = content.replace(pattern, replacement);
-      fs.writeFileSync(filePath, content, 'utf8');
+    const newContent = content.replace(pattern, replacement);
+    
+    if (newContent !== content) {
+      fs.writeFileSync(filePath, newContent, 'utf8');
       console.log(`✅ Actualizado: ${file}`);
       updatedCount++;
     } else {

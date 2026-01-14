@@ -165,9 +165,7 @@
     <script>
         // API URL detection: switches between local and production based on hostname
         // Note: This is duplicated across HTML files intentionally to keep each file self-contained
-        const API_URL = window.location.hostname === 'localhost' 
-            ? 'http://localhost:4000/api'
-            : 'https://discerning-comfort-production.up.railway.app/api';
+        const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:4000/api' : 'https://discerning-comfort-production.up.railway.app/api';
 
         const form = document.getElementById('loginForm');
         const messageDiv = document.getElementById('message');

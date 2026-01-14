@@ -7,7 +7,6 @@
 
 // Detectar entorno
 const isDevelopment = import.meta.env.DEV
-const isProduction = import.meta.env.PROD
 
 // Configuración principal
 export const API_CONFIG = {
