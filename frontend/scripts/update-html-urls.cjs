@@ -4,10 +4,10 @@
  * 🔄 Script para actualizar URLs en archivos HTML estáticos
  * 
  * Uso: 
- *   node scripts/update-html-urls.js <BACKEND_URL>
+ *   node scripts/update-html-urls.cjs <BACKEND_URL>
  * 
  * Ejemplo:
- *   node scripts/update-html-urls.js https://cafeteria.up.railway.app
+ *   node scripts/update-html-urls.cjs https://cafeteria.up.railway.app
  */
 
 const fs = require('fs');
@@ -19,9 +19,9 @@ const backendURL = process.argv[2];
 if (!backendURL) {
   console.error('❌ Error: Debes proporcionar la URL del backend');
   console.log('\n📖 Uso:');
-  console.log('  node scripts/update-html-urls.js <BACKEND_URL>\n');
+  console.log('  node scripts/update-html-urls.cjs <BACKEND_URL>\n');
   console.log('📝 Ejemplo:');
-  console.log('  node scripts/update-html-urls.js https://cafeteria.up.railway.app\n');
+  console.log('  node scripts/update-html-urls.cjs https://cafeteria.up.railway.app\n');
   process.exit(1);
 }
 
