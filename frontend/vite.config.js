@@ -23,23 +23,17 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       proxy: {
         '/api': {
-          target: (env.VITE_API_URL || 'http://localhost:4000/api').replace(/\/api$/, ''),
+          target: ((env.VITE_API_URL && env.VITE_API_URL.trim()) || 'http://localhost:4000/api').replace(/\/api$/, ''),
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path
         },
         '/socket.io': {
-          target: env.VITE_SOCKET_URL || 'http://localhost:4000',
+          target: (env.VITE_SOCKET_URL && env.VITE_SOCKET_URL.trim()) || 'http://localhost:4000',
           changeOrigin: true,
           ws: true
         }
       }
-    },
-    
-    // Variables de entorno expuestas al cliente
-    define: {
-      __API_URL__: JSON.stringify(env.VITE_API_URL),
-      __SOCKET_URL__: JSON.stringify(env.VITE_SOCKET_URL)
     }
   }
 })

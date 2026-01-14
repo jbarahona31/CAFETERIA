@@ -6,7 +6,6 @@ const SOCKET_URL = API_CONFIG.socketURL;
 class SocketService {
   constructor() {
     this.socket = null;
-    this.listeners = new Map();
   }
 
   connect() {
@@ -45,7 +44,6 @@ class SocketService {
       console.log('[Socket] Desconectando...');
       this.socket.disconnect();
       this.socket = null;
-      this.listeners.clear();
     }
   }
 
