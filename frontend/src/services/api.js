@@ -1,10 +1,6 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+import { API_CONFIG, getAuthHeaders } from '../config/api.config'
 
-// Helper to get auth headers
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
-  return token ? { 'Authorization': `Bearer ${token}` } : {};
-};
+const API_URL = API_CONFIG.baseURL
 
 export const api = {
   // Auth

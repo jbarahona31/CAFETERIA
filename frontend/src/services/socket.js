@@ -1,29 +1,40 @@
 import { io } from 'socket.io-client';
+import { API_CONFIG } from '../config/api.config';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:4000';
+const SOCKET_URL = API_CONFIG.socketURL;
 
 class SocketService {
   constructor() {
     this.socket = null;
+    this.listeners = new Map();
   }
 
   connect() {
-    if (this.socket?.connected) return this.socket;
+    if (this.socket?.connected) {
+      console.log('[Socket] Ya está conectado');
+      return this.socket;
+    }
+
+    console.log('[Socket] Conectando a:', SOCKET_URL);
 
     this.socket = io(SOCKET_URL, {
-      transports: ['websocket', 'polling']
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5,
+      timeout: 10000
     });
 
     this.socket.on('connect', () => {
-      console.log('[Socket] Conectado:', this.socket.id);
-    });
-
-    this.socket.on('disconnect', () => {
-      console.log('[Socket] Desconectado');
+      console.log('[Socket] ✅ Conectado exitosamente:', this.socket.id);
     });
 
     this.socket.on('connect_error', (error) => {
-      console.error('[Socket] Error de conexión:', error);
+      console.error('[Socket] ❌ Error de conexión:', error.message);
+    });
+
+    this.socket.on('disconnect', (reason) => {
+      console.log('[Socket] Desconectado:', reason);
     });
 
     return this.socket;
@@ -31,8 +42,10 @@ class SocketService {
 
   disconnect() {
     if (this.socket) {
+      console.log('[Socket] Desconectando...');
       this.socket.disconnect();
       this.socket = null;
+      this.listeners.clear();
     }
   }
 

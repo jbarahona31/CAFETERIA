@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "update-urls": "node scripts/update-html-urls.js",
+    "build:production": "npm run build"
   },
   "dependencies": {
     "react": "^18.2.0",
